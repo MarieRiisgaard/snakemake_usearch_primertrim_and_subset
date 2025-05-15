@@ -1,0 +1,36 @@
+# Main entrypoint of the workflow.
+# Please follow the best practices:
+# https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
+# in particular regarding the standardized folder structure mentioned there.
+import os
+import glob
+from snakemake.utils import min_version
+
+min_version("7.18.2")
+
+configfile: "config/config.yaml"
+
+# list all subfolders in input_dir
+sample_dirs = [
+    sample
+    for sample in os.listdir(config["input_dir"])
+    if sample.lower() != "unclassified"
+]
+
+#include: "rules/01-cat_fastq.smk"
+#include: "rules/02-qfilter.smk"
+#concat totalreads files here
+#include: "rules/03-rename_samples.smk"
+include: "rules/01-sample-prep.smk"
+include: "rules/04-denoise.smk"
+#include: "rules/05-rename_known_zotus.smk"
+include: "rules/06-sintax.smk"
+include: "rules/07-abund_table.smk"
+
+rule all:
+    input:
+        os.path.join(config["output_dir"], "zOTUs.fa"),
+        os.path.join(config["output_dir"], "zOTUs.sintax"),
+        os.path.join(config["output_dir"], "abund_table.tsv"),
+        os.path.join(config["output_dir"], "totalreads.csv"),
+        os.path.join(config["output_dir"], "totalreads_filtered.csv")
