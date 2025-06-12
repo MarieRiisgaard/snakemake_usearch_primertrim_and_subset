@@ -4,7 +4,7 @@ rule sintax:
     output:
         os.path.join(config["output_dir"], "zOTUs.sintax")
     log:
-        os.path.join(config["log_dir"], "sintax.log")
+        os.path.join(config["log_dir"], "04-sintax", "sintax.log")
     message:
         "Predicting taxonomy of zOTUs using SINTAX",
     resources:

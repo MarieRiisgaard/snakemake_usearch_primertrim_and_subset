@@ -9,13 +9,13 @@ rule sample_prep:
             glob.glob(os.path.join(config["input_dir"], wildcards.sample, "**", "*.fq.gz"), recursive=True)
         )
     output:
-        fastq=temp(os.path.join(config["tmp_dir"], "samples", "{sample}", "{sample}.fastq")),
+        fastq=temp(os.path.join(config["tmp_dir"], "01-sample_prep", "{sample}", "{sample}.fastq")),
         total_reads_file=temp(os.path.join(config["tmp_dir"], "totalreads", "{sample}_totalreads.csv")),
-        sample_renamed=temp(os.path.join(config["tmp_dir"], "samples", "{sample}", "{sample}_renamed.fastq")),
-        fastq_filtered = temp(os.path.join(os.path.join(config["tmp_dir"], "samples", "{sample}", "{sample}_filtered_renamed.fastq"))),
+        sample_renamed=temp(os.path.join(config["tmp_dir"], "01-sample_prep", "{sample}", "{sample}_renamed.fastq")),
+        fastq_filtered = temp(os.path.join(os.path.join(config["tmp_dir"], "01-sample_prep", "{sample}", "{sample}_filtered_renamed.fastq"))),
         totalfilteredreads_file = temp(os.path.join(config["tmp_dir"], "totalreads_filtered", "{sample}_totalfilteredreads.csv")),
     log:
-        os.path.join(config["log_dir"], "sample_prep", "{sample}.log"),
+        os.path.join(config["log_dir"], "01-sample_prep", "sample_prep_{sample}.log"),
     resources:
         mem_mb=lambda wc, input: max(10 * input.size_mb, 2048),
         runtime=30,
@@ -55,6 +55,8 @@ rule sample_prep:
         echo "*** Calculating total number of reads after filtering"
         num_reads=$(grep -c '^+$' {output.fastq_filtered})
         echo "{wildcards.sample},$num_reads" > "{output.totalfilteredreads_file}"
+
+        # filter primer sequences?
         """
 
 rule concatenate_total_reads_files:
@@ -71,7 +73,7 @@ rule concatenate_total_reads_files:
         total_reads_file=os.path.join(config["output_dir"], "totalreads.csv"),
         totalfilteredreads_file=os.path.join(config["output_dir"], "totalreads_filtered.csv")
     log:
-        os.path.join(config["log_dir"], "concatenate_total_reads.log")
+        os.path.join(config["log_dir"], "01-sample_prep", "concatenate_total_reads_files.log")
     message:
         "Concatenating total reads files"
     resources:
