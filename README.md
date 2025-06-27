@@ -1,4 +1,14 @@
 # snakemake_usearch
+Simple snakemake pipeline based on the standard [usearch11 SOP](https://drive5.com/usearch/manual/uparse_pipeline.html).
+
+## Usage
+First install snakemake and the required software into a conda environment as described below. Then run using fx:
+```
+conda activate snakemake_usearch
+snakemake --jobs 96
+```
+
+Use an executor if you are running on a HPC cluster. See the `slurm_submit.sbatch` for an example when running on a SLURM cluster.
 
 ## Installing required software
 Requirements are listed in `environment.yml`. To create as a conda environment simply run:
