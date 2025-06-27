@@ -28,8 +28,6 @@ rule orient:
         tab=temp(os.path.join(config["tmp_dir"], "02-denoise", "orient.txt"))
     log:
         os.path.join(config["log_dir"], "02-denoise", "orient.log")
-    conda:
-        "../envs/env.yml"
     params:
         db=config["db_sintax"]
     message:
@@ -57,8 +55,6 @@ rule trim_reads:
         fq=os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed_oriented_trimmed.fastq")
     log:
         os.path.join(config["log_dir"], "02-denoise", "trim_reads.log")
-    conda:
-        "../envs/env.yml"
     params:
         truncate_length=config["truncate_length"]
     message:
@@ -92,8 +88,6 @@ rule derep:
       temp(os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed_oriented_trimmed_derep.fa"))
     log:
       os.path.join(config["log_dir"], "02-denoise", "derep.log")
-    conda:
-        "../envs/env.yml"
     message:
         "Dereplicating all samples"
     resources:
@@ -124,8 +118,6 @@ rule unoise:
       os.path.join(config["output_dir"], "zOTUs.fa")
     log:
       os.path.join(config["log_dir"], "02-denoise", "unoise.log")
-    conda:
-      "../envs/env.yml"
     message:
       "Denoising/generating zOTUs/ASVs"
     resources:

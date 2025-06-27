@@ -20,8 +20,6 @@ rule sample_prep:
         mem_mb=lambda wc, input: max(10 * input.size_mb, 2048),
         runtime=30,
         cpus_per_task=1
-    conda:
-        "../envs/env.yml"
     params:
         sample_sep=config["sample_sep"],
         filtlong_args=config["filtlong_args"]

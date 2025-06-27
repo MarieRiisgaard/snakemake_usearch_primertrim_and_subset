@@ -12,8 +12,6 @@ rule sintax:
         runtime=60,
         cpus_per_task=config["max_threads"]
     threads: config["max_threads"]
-    conda:
-        "../envs/env.yml"
     params:
       db=config["db_sintax"]
     shell:

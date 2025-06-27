@@ -17,8 +17,6 @@ rule abund_table:
     threads: 4
     params:
         sample_sep=config['sample_sep']
-    conda:
-        "../envs/env.yml"
     shell:
         """
             exec &> "{log}"
@@ -47,8 +45,6 @@ rule merge_abund_tables:
         runtime=60,
         cpus_per_task=1
     threads: 1
-    conda:
-        "../envs/env.yml"
     params:
         input_csv=lambda wildcards, input: ",".join(input)
     shell:
