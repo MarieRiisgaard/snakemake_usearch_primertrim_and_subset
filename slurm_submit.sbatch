@@ -8,8 +8,12 @@
 # Exit on first error and if any variables are unset
 set -eu
 
+# Activate the conda environment
 conda activate snakemake_usearch
 
-rm -rf logs tmp output
-snakemake --unlock
-snakemake --executor slurm --jobs 96 --notemp --profile profiles/biocloud
+# Optionally clear files from a previous run before starting
+#rm -rf logs tmp output
+#snakemake --unlock
+
+# Run snakemake
+snakemake --executor slurm --jobs 96
