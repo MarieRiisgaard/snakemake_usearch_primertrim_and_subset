@@ -1,4 +1,4 @@
-name: nanopore_16samp
+name: snakemake_usearch
 channels:
   - bioconda
 dependencies:
@@ -9,6 +9,3 @@ dependencies:
  - perl=5.32.1
  - gzip=1.13
  - filtlong=0.2.1
- - usearch=12.0_beta
- - vsearch=2.30.0
- - parallel
