@@ -9,8 +9,7 @@ db_sintax: "/databases/midas/MiDAS5.3_20240320/FLASVs_w_sintax.fa"
 filtlong_args: "--min_length 200 --min_mean_q 90"
 max_threads: 32
 sample_sep: "_"
-# truncate sequences to the same length before denoising (=creating zOTUs/ASVs)
-truncate_length: 500
+primers: "AGRGTTYGATYMTGGCTCAG...GTTTGGCACCTCGATGTCG"
 # this one just removes singletons before denoising and adds seq counts to the fasta headers
 derep_minsize: 2
 # nanopore data is much more noisy than Illumina data, which unoise is designed for,

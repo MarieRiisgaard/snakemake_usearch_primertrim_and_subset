@@ -20,59 +20,33 @@ rule concat_all:
         cat {input} > {output}
       """
 
-rule orient:
+rule trim_primers:
     input:
         os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed.fastq")
     output:
-        fq=temp(os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed_oriented.fastq")),
-        tab=temp(os.path.join(config["tmp_dir"], "02-denoise", "orient.txt"))
+        temp(os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed_oriented_trimmed.fastq"))
     log:
-        os.path.join(config["log_dir"], "02-denoise", "orient.log")
+        os.path.join(config["log_dir"], "02-denoise", "trim_primers.log")
     params:
-        db=config["db_sintax"]
+        primers=config["primers"]
     message:
-        "Orienting reads"
+        "Orienting and trimming reads according to primers"
     resources:
         mem_mb=2048,
         runtime=120,
-        cpus_per_task=1
-    threads: 1
+        cpus_per_task=10
+    threads: 10
     shell:
         """
         exec &> "{log}"
         set -euxo pipefail
 
-        usearch11 -orient {input} \
-          -db {params.db} \
-          -fastqout {output.fq} \
-          -tabbedout {output.tab}
+        # this step both orients and trims at once
+        cutadapt -g {params.primers} \
+          --revcomp \
+          -o {output} --discard-untrimmed {input} -j {threads}
         """
 
-rule trim_reads:
-    input:
-        fq=os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed_oriented.fastq")
-    output:
-        fq=os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed_oriented_trimmed.fastq")
-    log:
-        os.path.join(config["log_dir"], "02-denoise", "trim_reads.log")
-    params:
-        truncate_length=config["truncate_length"]
-    message:
-        "Trimming oriented reads"
-    resources:
-        mem_mb=1024,
-        runtime=60,
-        cpus_per_task=1
-    threads: 1
-    shell:
-        """
-        exec &> "{log}"
-        set -euxo pipefail
-
-        usearch -fastx_truncate {input.fq} \
-          -trunclen {params.truncate_length} \
-          -fastqout {output.fq}
-        """
 
 # according to Edgar QC filtering should be done here, not in sample_prep
 # rule qc_filter:
