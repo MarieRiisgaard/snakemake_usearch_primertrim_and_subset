@@ -26,7 +26,7 @@ rule concat_all:
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
-        "envs/snakemake_usearch.yml"
+        "../envs/snakemake_usearch.yml"
     threads: 1
     shell:
         """
@@ -63,7 +63,7 @@ rule trim_primers:
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
-        "envs/snakemake_usearch.yml"
+        "../envs/snakemake_usearch.yml"
     threads: 10
     shell:
         """
@@ -111,7 +111,7 @@ rule derep:
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
-        "envs/snakemake_usearch.yml"
+        "../envs/snakemake_usearch.yml"
     params:
         derep_minsize=config["derep_minsize"],
     threads: 4  # this command spends most of the time just reading in the file
@@ -150,7 +150,7 @@ rule unoise:
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
-        "envs/snakemake_usearch.yml"
+        "../envs/snakemake_usearch.yml"
     params:
         unoise_minsize=config["unoise_minsize"],
     threads: 1
