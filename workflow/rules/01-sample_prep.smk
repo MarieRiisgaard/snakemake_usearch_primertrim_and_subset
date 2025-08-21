@@ -43,7 +43,7 @@ rule sample_prep:
         echo "{wildcards.sample},$num_reads" > "{output.total_reads_file}"
 
         echo "*** Renaming reads with sample name"
-        usearch11 -fastx_relabel \
+        usearch -fastx_relabel \
           "{output.fastq}" \
           -prefix "{wildcards.sample}{params.sample_sep}" \
           -fastqout "{output.sample_renamed}"

@@ -57,7 +57,7 @@ rule merge_abund_tables:
             set -euxo pipefail
         
             # merge abundance tables
-            usearch11 -otutab_merge \
+            usearch -otutab_merge \
                 {params.input_csv} \
                 -output "{output}"
             # this errors if just one file is empty, what to do?!

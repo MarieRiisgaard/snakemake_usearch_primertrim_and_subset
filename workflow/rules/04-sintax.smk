@@ -21,7 +21,7 @@ rule sintax:
         exec &> "{log}"
         set -euxo pipefail
             
-        usearch11 -sintax \
+        usearch -sintax \
           "{input}" \
           -db "{params.db}" \
           -tabbedout "{output}" \
