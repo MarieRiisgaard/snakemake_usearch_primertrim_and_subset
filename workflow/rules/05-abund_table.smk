@@ -16,6 +16,8 @@ rule abund_table:
         cpus_per_task=4
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+    conda:
+        "envs/snakemake_usearch.yml"
     threads: 4
     params:
         sample_sep=config['sample_sep']
@@ -48,6 +50,8 @@ rule merge_abund_tables:
         cpus_per_task=1
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+    conda:
+        "envs/snakemake_usearch.yml"
     threads: 1
     params:
         input_csv=lambda wildcards, input: ",".join(input)
@@ -78,6 +82,8 @@ rule rarefy_abund_table:
         cpus_per_task=1
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+    conda:
+        "envs/snakemake_usearch.yml"
     threads: 1
     params:
         rarefy=config['rarefy']

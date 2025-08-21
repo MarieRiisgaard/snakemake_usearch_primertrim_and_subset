@@ -22,6 +22,8 @@ rule sample_prep:
         cpus_per_task=1
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+    conda:
+        "envs/snakemake_usearch.yml"
     params:
         sample_sep=config["sample_sep"],
         filtlong_args=config["filtlong_args"]
@@ -81,6 +83,8 @@ rule concatenate_total_reads_files:
         runtime=30
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+    conda:
+        "envs/snakemake_usearch.yml"
     threads: 1
     shell:
         """

@@ -13,6 +13,8 @@ rule sintax:
         cpus_per_task=config["max_threads"]
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+    conda:
+        "envs/snakemake_usearch.yml"
     threads: config["max_threads"]
     params:
       db=config["db_sintax"]
