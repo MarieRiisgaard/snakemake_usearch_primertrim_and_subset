@@ -5,10 +5,11 @@ output_dir: "output"
 tmp_dir: "tmp"
 log_dir: "logs"
 db_sintax: "db_sintax.fa"
-filtlong_args: "--min_length 400 --min_mean_q 90"
-max_threads: 16
-unoise_minsize: 4
+# to skip filtering altogether set to "--min_length 1"
+filtlong_args: "--min_length 200 --min_mean_q 90"
+max_threads: 32
 sample_sep: "_"
 primers: "AGRGTTYGATYMTGGCTCAG...GTTTGGCACCTCGATGTCG"
 derep_minsize: 2
+unoise_minsize: 8
 rarefy: 2000
