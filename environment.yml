@@ -1,6 +1,7 @@
 name: snakemake_usearch
 channels:
   - bioconda
+  - conda-forge
 dependencies:
  - snakemake=9.1.6
  - snakemake-executor-plugin-slurm=1.1.0
