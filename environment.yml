@@ -10,3 +10,4 @@ dependencies:
  - gzip=1.13
  - filtlong=0.2.1
  - cutadapt=5.1
+ - usearch=12.0_beta
