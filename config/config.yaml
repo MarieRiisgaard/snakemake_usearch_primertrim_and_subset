@@ -1,6 +1,5 @@
 # This file is for various variables used throughout the workflow.
-# Everything else regarding how things are run should go in the profile config, not here.
-# See description of each setting in the README.md file.
+# See a description of each setting in the README.md file.
 input_dir: "data/2025-04-hyp-subset"
 output_dir: "output"
 tmp_dir: "tmp"
@@ -10,8 +9,6 @@ filtlong_args: "--min_length 200 --min_mean_q 90"
 max_threads: 32
 sample_sep: "_"
 primers: "AGRGTTYGATYMTGGCTCAG...GTTTGGCACCTCGATGTCG"
-# this one just removes singletons before denoising and adds seq counts to the fasta headers
 derep_minsize: 2
-# nanopore data is much more noisy than Illumina data, which unoise is designed for,
-# so never set this lower than the default 8, preferably 16 or even more, to avoid false-positive de-novo ASVs
 unoise_minsize: 8
+rarefy: 2000

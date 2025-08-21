@@ -33,4 +33,5 @@ rule all:
         os.path.join(config["output_dir"], "zOTUs.sintax"),
         os.path.join(config["output_dir"], "abund_table.tsv"),
         os.path.join(config["output_dir"], "totalreads.csv"),
-        os.path.join(config["output_dir"], "totalreads_filtered.csv")
+        os.path.join(config["output_dir"], "totalreads_filtered.csv"),
+        os.path.join(config["output_dir"], "abund_table_rarefied.tsv")

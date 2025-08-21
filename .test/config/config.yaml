@@ -1,3 +1,5 @@
+# This file is for various variables used throughout the workflow.
+# See a description of each setting in the README.md file.
 input_dir: "nanopore_run_xyz123/fastq_pass"
 output_dir: "output"
 tmp_dir: "tmp"
@@ -6,3 +8,7 @@ db_sintax: "db_sintax.fa"
 filtlong_args: "--min_length 400 --min_mean_q 90"
 max_threads: 16
 unoise_minsize: 4
+sample_sep: "_"
+primers: "AGRGTTYGATYMTGGCTCAG...GTTTGGCACCTCGATGTCG"
+derep_minsize: 2
+rarefy: 2000

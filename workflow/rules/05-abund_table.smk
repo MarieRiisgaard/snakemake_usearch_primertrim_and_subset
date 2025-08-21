@@ -58,3 +58,27 @@ rule merge_abund_tables:
                 -output "{output}"
             # this errors if just one file is empty, what to do?!
         """
+
+rule rarefy_abund_table:
+    input:
+        os.path.join(config["output_dir"], "abund_table.tsv")
+    output:
+        os.path.join(config["output_dir"], "abund_table_rarefied.tsv")
+    log:
+        os.path.join(config["log_dir"], "05-abund_table", "rarefy_abund_tables.log")
+    message:
+        "Rarefying abundance table"
+    resources:
+        mem_mb=2048,
+        runtime=120,
+        cpus_per_task=1
+    threads: 1
+    params:
+        rarefy=config['rarefy']
+    shell:
+        """
+        exec &> "{log}"
+        set -euxo pipefail
+
+        usearch -otutab_rare {input} -sample_size {params.rarefy} -output {output}
+        """

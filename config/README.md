@@ -1,26 +1,19 @@
 # Configuration
+The configuration file `config.yaml` is used to set various options used throughout the workflow.
 
- - `input_dir`: The input folder is expected to contain a subfolder for each sampleID/barcode, then all fastq files in each subfolder are concatenated and the folder name is used as sample ID downstream. This is usually the "fastq_pass" folder from nanopore sequencing and basecalling output 
+| Option | Default value | Description |
+| ---: | :---: | :---: |
+| input_dir | "data/2025-04-hyp-subset" | The input folder is expected to contain a subfolder for each sampleID/barcode, in which all fastq files will be concatenated, and the subfolder names used as sample IDs downstream. For nanopore this is usually the "fastq_pass" folder with demultiplexed reads. |
+| output_dir | "output" | Folder for the results. |
+| tmp_dir | "tmp" | Folder for temporary files, which are deleted by default after a succesful run. |
+| log_dir | "logs" | Folder for logs for each rule. |
+| db_sintax | "/databases/midas/MiDAS5.3_20240320/FLASVs_w_sintax.fa" | Path to the taxonomic reference database used to classify the ASVs/zOTUs in SINTAX format. |
+| filtlong_args | "--min_length 200 --min_mean_q 90" | Arguments for the filtlong command used for pre-filtering. |
+| max_threads | 32 | Max number of threads to use for any individual rule. |
+| sample_sep | "_" | Separator used for the `usearch -otutab -sample_delim` argument. |
+| primers | "AGRGTTYGATYMTGGCTCAG...GTTTGGCACCTCGATGTCG" | Primer pair used. Passed on as-is to the `cutadapt` command. This is required for trimming and orienting reads correctly. |
+| derep_minsize | 2 | Minimum abundance of each read. Only impacts ASV/zOTU generation, not abundance estimation, which will be performed against the raw unfiltered reads. |
+| unoise_minsize | 8 | Increase this proportionally with platform error-rate to avoid false-positive de-novo ASVs/zOTUs. Never set to lower than 2, singletons cannot be trusted. |
+| rarefy | 10000 | Rarefy abundance table to an equal sample size. Both a rarefied and an unrarefied abundance table will be generated. |
 
- - `output_dir`: Output directory with the final results
-
- - `tmp_dir`: Directory for temporary files
-
- - `log_dir`: Directory for log files for all rules
-
- - `db_fasta`: Database for minimap2 in fasta file format. Each sequence header must only contain an ID matching the taxonomy file below, nothing else.
-
- - `db_tax`: 2-column TSV file with corresponding taxonomy for each sequence in the above fasta file. The first column is for the sequence IDs, the second a semi-colon separated taxonomy string.
-
- - `minalignlen`: Minimum alignment length for the mapping. Any alignments shorter than this threshold will be filtered
-
- - `minIDfrac`: Minimum identity threshold of each mapping (value must be between `0.0-1.0`). Any alignments with an identity lower than this threshold will be filtered.
-
- - `filtlong_args`: Arguments passed on to the `filtlong` command for pre-filtering reads
- 
- - `max_threads`: Max number of threads for any rule
-
-Have a look in the `.test` directory for example files.
-
-## Database files
-If you want to use the SILVA database, you can use [this R script](https://github.com/KasperSkytte/bioscripts/blob/main/extract_qiimetax.R) to create the two requires database files. For the MiDAS database the files can be downloaded directly from [download section](https://midasfieldguide.org/guide/downloads) on the website.
+Have a look in the `.test` directory for minimal example files.
