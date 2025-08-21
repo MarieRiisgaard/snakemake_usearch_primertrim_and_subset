@@ -11,6 +11,8 @@ rule concat_all:
         mem_mb=512,
         runtime=30,
         cpus_per_task=1
+    container:
+        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     threads: 1
     shell:
       """
@@ -35,6 +37,8 @@ rule trim_primers:
         mem_mb=2048,
         runtime=120,
         cpus_per_task=10
+    container:
+        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     threads: 10
     shell:
         """
@@ -68,6 +72,8 @@ rule derep:
         mem_mb=lambda wc, input: max(1.5 * input.size_mb, 4096), # a 64GB file took 72GB mem
         runtime=600,
         cpus_per_task=4
+    container:
+        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     params:
       derep_minsize=config["derep_minsize"]
     threads: 4 # this command spends most of the time just reading in the file
@@ -98,6 +104,8 @@ rule unoise:
       mem_mb=lambda wc, input: max(3 * input.size_mb, 512),
       runtime=600,
       cpus_per_task=1
+    container:
+        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     params:
       unoise_minsize=config["unoise_minsize"]
     threads: 1

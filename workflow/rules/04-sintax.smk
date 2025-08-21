@@ -11,6 +11,8 @@ rule sintax:
         mem_mb=4096,
         runtime=60,
         cpus_per_task=config["max_threads"]
+    container:
+        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     threads: config["max_threads"]
     params:
       db=config["db_sintax"]

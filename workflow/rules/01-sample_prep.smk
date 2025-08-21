@@ -20,6 +20,8 @@ rule sample_prep:
         mem_mb=lambda wc, input: max(10 * input.size_mb, 2048),
         runtime=30,
         cpus_per_task=1
+    container:
+        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     params:
         sample_sep=config["sample_sep"],
         filtlong_args=config["filtlong_args"]
@@ -77,6 +79,8 @@ rule concatenate_total_reads_files:
     resources:
         mem_mb=512,
         runtime=30
+    container:
+        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     threads: 1
     shell:
         """

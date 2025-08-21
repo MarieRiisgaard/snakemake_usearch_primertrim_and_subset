@@ -14,6 +14,8 @@ rule abund_table:
         mem_mb=1024, # this needs to be calculated dynamically based on input file size
         runtime=120,
         cpus_per_task=4
+    container:
+        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     threads: 4
     params:
         sample_sep=config['sample_sep']
@@ -44,6 +46,8 @@ rule merge_abund_tables:
         mem_mb=2048,
         runtime=60,
         cpus_per_task=1
+    container:
+        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     threads: 1
     params:
         input_csv=lambda wildcards, input: ",".join(input)
@@ -72,6 +76,8 @@ rule rarefy_abund_table:
         mem_mb=2048,
         runtime=120,
         cpus_per_task=1
+    container:
+        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     threads: 1
     params:
         rarefy=config['rarefy']
