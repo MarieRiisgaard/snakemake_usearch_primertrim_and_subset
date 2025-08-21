@@ -1,44 +1,65 @@
 rule concat_all:
     input:
-        expand(os.path.join(config["tmp_dir"], "01-sample_prep", "{sample}", "{sample}_filtered_renamed.fastq"), sample=sample_dirs)
+        expand(
+            os.path.join(
+                config["tmp_dir"],
+                "01-sample_prep",
+                "{sample}",
+                "{sample}_filtered_renamed.fastq",
+            ),
+            sample=sample_dirs,
+        ),
     output:
-        temp(os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed.fastq"))
+        temp(
+            os.path.join(
+                config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed.fastq"
+            )
+        ),
     log:
-        os.path.join(config["log_dir"], "02-denoise", "concat_all.log")
+        os.path.join(config["log_dir"], "02-denoise", "concat_all.log"),
     message:
-        "Concatenating all samples before denoising (generate zOTUs/ASVs)",
+        "Concatenating all samples before denoising (generate zOTUs/ASVs)"
     resources:
         mem_mb=512,
         runtime=30,
-        cpus_per_task=1
+        cpus_per_task=1,
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
         "envs/snakemake_usearch.yml"
     threads: 1
     shell:
-      """
+        """
         exec &> "{log}"
         set -euxo pipefail
         
         cat {input} > {output}
       """
 
+
 rule trim_primers:
     input:
-        os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed.fastq")
+        os.path.join(
+            config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed.fastq"
+        ),
     output:
-        temp(os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed_oriented_trimmed.fastq"))
+        temp(
+            os.path.join(
+                config["tmp_dir"],
+                "02-denoise",
+                "all_samples_filtered_renamed_oriented_trimmed.fastq",
+            )
+        ),
     log:
-        os.path.join(config["log_dir"], "02-denoise", "trim_primers.log")
+        os.path.join(config["log_dir"], "02-denoise", "trim_primers.log"),
     params:
-        primers=config["primers"]
+        primers=config["primers"],
     message:
         "Orienting and trimming reads according to primers"
     resources:
         mem_mb=2048,
         runtime=120,
-        cpus_per_task=10
+        cpus_per_task=10,
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
@@ -63,28 +84,39 @@ rule trim_primers:
 #     usearch -fastq_filter trimmed.fq -fastq_maxee 1.0 -fastaout filtered.fa
 #     """
 
+
 rule derep:
     input:
-      os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed_oriented_trimmed.fastq")
+        os.path.join(
+            config["tmp_dir"],
+            "02-denoise",
+            "all_samples_filtered_renamed_oriented_trimmed.fastq",
+        ),
     output:
-      temp(os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed_oriented_trimmed_derep.fa"))
+        temp(
+            os.path.join(
+                config["tmp_dir"],
+                "02-denoise",
+                "all_samples_filtered_renamed_oriented_trimmed_derep.fa",
+            )
+        ),
     log:
-      os.path.join(config["log_dir"], "02-denoise", "derep.log")
+        os.path.join(config["log_dir"], "02-denoise", "derep.log"),
     message:
         "Dereplicating all samples"
     resources:
-        mem_mb=lambda wc, input: max(1.5 * input.size_mb, 4096), # a 64GB file took 72GB mem
+        mem_mb=lambda wc, input: max(1.5 * input.size_mb, 4096),  # a 64GB file took 72GB mem
         runtime=600,
-        cpus_per_task=4
+        cpus_per_task=4,
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
         "envs/snakemake_usearch.yml"
     params:
-      derep_minsize=config["derep_minsize"]
-    threads: 4 # this command spends most of the time just reading in the file
+        derep_minsize=config["derep_minsize"],
+    threads: 4  # this command spends most of the time just reading in the file
     shell:
-      """
+        """
         exec &> "{log}"
         set -euxo pipefail
         
@@ -97,28 +129,33 @@ rule derep:
           -relabel Uniq
       """
 
+
 rule unoise:
     input:
-      os.path.join(config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed_oriented_trimmed_derep.fa")
+        os.path.join(
+            config["tmp_dir"],
+            "02-denoise",
+            "all_samples_filtered_renamed_oriented_trimmed_derep.fa",
+        ),
     output:
-      os.path.join(config["output_dir"], "zOTUs.fa")
+        os.path.join(config["output_dir"], "zOTUs.fa"),
     log:
-      os.path.join(config["log_dir"], "02-denoise", "unoise.log")
+        os.path.join(config["log_dir"], "02-denoise", "unoise.log"),
     message:
-      "Denoising/generating zOTUs/ASVs"
+        "Denoising/generating zOTUs/ASVs"
     resources:
-      mem_mb=lambda wc, input: max(3 * input.size_mb, 512),
-      runtime=600,
-      cpus_per_task=1
+        mem_mb=lambda wc, input: max(3 * input.size_mb, 512),
+        runtime=600,
+        cpus_per_task=1,
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
         "envs/snakemake_usearch.yml"
     params:
-      unoise_minsize=config["unoise_minsize"]
+        unoise_minsize=config["unoise_minsize"],
     threads: 1
     shell:
-      """
+        """
         exec &> "{log}"
         set -euxo pipefail
         

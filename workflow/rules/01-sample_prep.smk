@@ -3,30 +3,72 @@ rule sample_prep:
         # function to list all fastq files per wildcard (subfolder/sample)
         # see https://snakemake.readthedocs.io/en/latest/snakefiles/rules.html#input-functions
         lambda wildcards: (
-            glob.glob(os.path.join(config["input_dir"], wildcards.sample, "**", "*.fastq"), recursive=True) +
-            glob.glob(os.path.join(config["input_dir"], wildcards.sample, "**", "*.fq"), recursive=True) +
-            glob.glob(os.path.join(config["input_dir"], wildcards.sample, "**", "*.fastq.gz"), recursive=True) +
-            glob.glob(os.path.join(config["input_dir"], wildcards.sample, "**", "*.fq.gz"), recursive=True)
-        )
+            glob.glob(
+                os.path.join(config["input_dir"], wildcards.sample, "**", "*.fastq"),
+                recursive=True,
+            )
+            + glob.glob(
+                os.path.join(config["input_dir"], wildcards.sample, "**", "*.fq"),
+                recursive=True,
+            )
+            + glob.glob(
+                os.path.join(
+                    config["input_dir"], wildcards.sample, "**", "*.fastq.gz"
+                ),
+                recursive=True,
+            )
+            + glob.glob(
+                os.path.join(config["input_dir"], wildcards.sample, "**", "*.fq.gz"),
+                recursive=True,
+            )
+        ),
     output:
-        fastq=temp(os.path.join(config["tmp_dir"], "01-sample_prep", "{sample}", "{sample}.fastq")),
-        total_reads_file=temp(os.path.join(config["tmp_dir"], "totalreads", "{sample}_totalreads.csv")),
-        sample_renamed=temp(os.path.join(config["tmp_dir"], "01-sample_prep", "{sample}", "{sample}_renamed.fastq")),
-        fastq_filtered = temp(os.path.join(os.path.join(config["tmp_dir"], "01-sample_prep", "{sample}", "{sample}_filtered_renamed.fastq"))),
-        totalfilteredreads_file = temp(os.path.join(config["tmp_dir"], "totalreads_filtered", "{sample}_totalfilteredreads.csv")),
+        fastq=temp(
+            os.path.join(
+                config["tmp_dir"], "01-sample_prep", "{sample}", "{sample}.fastq"
+            )
+        ),
+        total_reads_file=temp(
+            os.path.join(config["tmp_dir"], "totalreads", "{sample}_totalreads.csv")
+        ),
+        sample_renamed=temp(
+            os.path.join(
+                config["tmp_dir"],
+                "01-sample_prep",
+                "{sample}",
+                "{sample}_renamed.fastq",
+            )
+        ),
+        fastq_filtered=temp(
+            os.path.join(
+                os.path.join(
+                    config["tmp_dir"],
+                    "01-sample_prep",
+                    "{sample}",
+                    "{sample}_filtered_renamed.fastq",
+                )
+            )
+        ),
+        totalfilteredreads_file=temp(
+            os.path.join(
+                config["tmp_dir"],
+                "totalreads_filtered",
+                "{sample}_totalfilteredreads.csv",
+            )
+        ),
     log:
         os.path.join(config["log_dir"], "01-sample_prep", "sample_prep_{sample}.log"),
     resources:
         mem_mb=lambda wc, input: max(10 * input.size_mb, 2048),
         runtime=30,
-        cpus_per_task=1
+        cpus_per_task=1,
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
         "envs/snakemake_usearch.yml"
     params:
         sample_sep=config["sample_sep"],
-        filtlong_args=config["filtlong_args"]
+        filtlong_args=config["filtlong_args"],
     threads: 1
     message:
         "{wildcards.sample}: Filtering and preparing reads"
@@ -61,6 +103,7 @@ rule sample_prep:
         # filter primer sequences?
         """
 
+
 rule concatenate_total_reads_files:
     input:
         total_reads_file=expand(
@@ -68,19 +111,27 @@ rule concatenate_total_reads_files:
             sample=sample_dirs,
         ),
         totalfilteredreads_file=expand(
-            os.path.join(config["tmp_dir"], "totalreads_filtered", "{sample}_totalfilteredreads.csv"),
+            os.path.join(
+                config["tmp_dir"],
+                "totalreads_filtered",
+                "{sample}_totalfilteredreads.csv",
+            ),
             sample=sample_dirs,
-        )
+        ),
     output:
         total_reads_file=os.path.join(config["output_dir"], "totalreads.csv"),
-        totalfilteredreads_file=os.path.join(config["output_dir"], "totalreads_filtered.csv")
+        totalfilteredreads_file=os.path.join(
+            config["output_dir"], "totalreads_filtered.csv"
+        ),
     log:
-        os.path.join(config["log_dir"], "01-sample_prep", "concatenate_total_reads_files.log")
+        os.path.join(
+            config["log_dir"], "01-sample_prep", "concatenate_total_reads_files.log"
+        ),
     message:
         "Concatenating total reads files"
     resources:
         mem_mb=512,
-        runtime=30
+        runtime=30,
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:

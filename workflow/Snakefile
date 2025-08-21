@@ -8,7 +8,9 @@ from snakemake.utils import min_version
 
 min_version("7.18.2")
 
+
 configfile: "config/config.yaml"
+
 
 # list all subfolders in input_dir
 sample_dirs = [
@@ -17,15 +19,17 @@ sample_dirs = [
     if sample.lower() != "unclassified"
 ]
 
-#include: "rules/01-cat_fastq.smk"
-#include: "rules/02-qfilter.smk"
-#concat totalreads files here
-#include: "rules/03-rename_samples.smk"
+
+# include: "rules/01-cat_fastq.smk"
+# include: "rules/02-qfilter.smk"
+# concat totalreads files here
+# include: "rules/03-rename_samples.smk"
 include: "rules/01-sample_prep.smk"
 include: "rules/02-denoise.smk"
-#include: "rules/03-rename_known_zotus.smk"
+# include: "rules/03-rename_known_zotus.smk"
 include: "rules/04-sintax.smk"
 include: "rules/05-abund_table.smk"
+
 
 rule all:
     input:
@@ -34,4 +38,4 @@ rule all:
         os.path.join(config["output_dir"], "abund_table.tsv"),
         os.path.join(config["output_dir"], "totalreads.csv"),
         os.path.join(config["output_dir"], "totalreads_filtered.csv"),
-        os.path.join(config["output_dir"], "abund_table_rarefied.tsv")
+        os.path.join(config["output_dir"], "abund_table_rarefied.tsv"),
