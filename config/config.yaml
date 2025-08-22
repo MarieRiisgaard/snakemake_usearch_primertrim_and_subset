@@ -12,7 +12,5 @@ sample_sep: "_"
 primers: "AGRGTTYGATYMTGGCTCAG...GTTTGGCACCTCGATGTCG"
 derep_minsize: 2
 unoise_minsize: 8
-# usearch -otutab_rare command requires usearch version 11,
-# which is not available from the bioconda channel, hence optional
 rarefy_abund_table: False
 rarefy_sample_size: 2000

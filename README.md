@@ -22,8 +22,10 @@ Requirements are listed in `environment.yml`. To create as a conda environment s
 conda env create --file environment.yml -n snakemake_usearch
 ```
 
+All rules use the same environment, hence it's best to just load the environment first before running `snakemake`, and avoid using `--use-conda` or `--sdm conda`.
+
 ### usearch version 12 only includes a minimal subset of commands
-The `usearch` version currently available (version 12) from the bioconda channel only contains a small subset of commands and doesn't include for example `-otutab_rare`, which is required if you want to also produce a rarefied abundance table (disabled by default, set `rarefy_abund_table` to `True` in the config file to enable). As `usearch` is a single binary requiring no external dependencies, you can install `usearch` version 11 by simply overwriting the `usearch` binary in the conda environment. Download a precompiled `usearch` version 11 binary from [usearch_old_binaries](https://github.com/rcedgar/usearch_old_binaries/) matching your platform and architecture and manually place it in the `bin` folder in the conda environment and make it executable. For example, on Linux, you can run the following:
+The `usearch` version currently available (version 12) from the bioconda channel only contains a small subset of commands and doesn't include some required commands, for example `fastx_relabel` and `otutab_rare`. As `usearch` is a single binary requiring no external dependencies, you can install `usearch` version 11 by simply overwriting the `usearch` binary in the conda environment by downloading one of the precompiled binaries from [usearch_old_binaries](https://github.com/rcedgar/usearch_old_binaries/) matching your platform and architecture, and then manually place it in the `bin` folder in the conda environment (remember to make it executable). For example, on Linux, you can run the following:
 
 ```
 conda env create -f environment.yml -n snakemake_usearch
@@ -34,4 +36,3 @@ chmod +x "${CONDA_PREFIX}/bin/usearch"
 
 For other platforms or architectures adjust accordingly.
 
-All rules use the same environment, hence it's best to just load the environment first before running `snakemake`, and avoid using `--use-conda` or `--sdm conda`.
