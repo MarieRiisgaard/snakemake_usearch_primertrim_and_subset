@@ -25,5 +25,5 @@ RUN conda env create --prefix /conda-envs/04a2b4c5b47798998d6f00ee3422dd77 --fil
     conda clean --all -y
 
 # install usearch11 into the conda environment (or overwrite usearch12)
-RUN wget https://github.com/rcedgar/usearch_old_binaries/raw/refs/heads/main/bin/usearch11.0.667_i86linux64 -O "/conda-envs/389c17c98ac4659ba7ff04e3da4b7a48/bin/usearch" \
-  && chmod +x "/conda-envs/389c17c98ac4659ba7ff04e3da4b7a48/bin/usearch"
+RUN wget https://github.com/rcedgar/usearch_old_binaries/raw/refs/heads/main/bin/usearch11.0.667_i86linux64 -O "/conda-envs/04a2b4c5b47798998d6f00ee3422dd77/bin/usearch" \
+  && chmod +x "/conda-envs/04a2b4c5b47798998d6f00ee3422dd77/bin/usearch"
