@@ -6,7 +6,7 @@ import os
 import glob
 from snakemake.utils import min_version
 
-min_version("7.18.2")
+min_version("9.1.6")
 
 
 configfile: "config/config.yaml"
@@ -38,4 +38,4 @@ rule all:
         os.path.join(config["output_dir"], "abund_table.tsv"),
         os.path.join(config["output_dir"], "totalreads.csv"),
         os.path.join(config["output_dir"], "totalreads_filtered.csv"),
-        os.path.join(config["output_dir"], "abund_table_rarefied.tsv"),
+        os.path.join(config["output_dir"], "abund_table_rarefied.tsv") if config["rarefy_abund_table"] else [],

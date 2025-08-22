@@ -1,0 +1,4 @@
+{
+  "r.rterm.linux": "${userHome}/.conda/envs/snakemake_usearch/bin/R",
+  "python.defaultInterpreterPath": "${userHome}/.conda/envs/snakemake_usearch/bin/python"
+}

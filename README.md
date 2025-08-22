@@ -14,7 +14,7 @@ Use an executor if you are running on a HPC cluster. See the `slurm_submit.sbatc
 Install the required software by using either the provided `Dockerfile` or `environment.yml` file to build a Docker container or conda environment with all the required tools, see below.
 
 ### Docker
-Tre-built Docker container available from [`ghcr.io/kasperskytte/snakemake_usearch:main`](https://github.com/KasperSkytte/snakemake_usearch/pkgs/container/snakemake_usearch) includes all required software, including `usearch` version 11.
+The pre-built Docker container available from [`ghcr.io/kasperskytte/snakemake_usearch:main`](https://github.com/KasperSkytte/snakemake_usearch/pkgs/container/snakemake_usearch) is built from the `Dockerfile` and includes all required software (including `usearch` version 11, not 12, see below).
 
 ### Conda
 Requirements are listed in `environment.yml`. To create as a conda environment simply run:
@@ -22,8 +22,8 @@ Requirements are listed in `environment.yml`. To create as a conda environment s
 conda env create --file environment.yml -n snakemake_usearch
 ```
 
-#### usearch version 12 is insiffucient
-The `usearch` version currently available (version 12) from the bioconda channel only contains a small subset of commands and doesn't include `-otutab_rare`, which is required. If  you don't need a rarefied abundance table you can remove the `rarefy_abund_table` rule and version 12 would be sufficient. Otherwise you must download a precompiled `usearch` version 11 binary from [usearch_old_binaries](https://github.com/rcedgar/usearch_old_binaries/) and manually place it in the `bin` folder in the conda environment and make it executable. For example, on Linux, you can run the following:
+### usearch version 12 only includes a minimal subset of commands
+The `usearch` version currently available (version 12) from the bioconda channel only contains a small subset of commands and doesn't include for example `-otutab_rare`, which is required if you want to also produce a rarefied abundance table (disabled by default, set `rarefy_abund_table` to `True` in the config file to enable). As `usearch` is a single binary requiring no external dependencies, you can install `usearch` version 11 by simply overwriting the `usearch` binary in the conda environment. Download a precompiled `usearch` version 11 binary from [usearch_old_binaries](https://github.com/rcedgar/usearch_old_binaries/) matching your platform and architecture and manually place it in the `bin` folder in the conda environment and make it executable. For example, on Linux, you can run the following:
 
 ```
 conda env create -f environment.yml -n snakemake_usearch
@@ -34,4 +34,4 @@ chmod +x "${CONDA_PREFIX}/bin/usearch"
 
 For other platforms or architectures adjust accordingly.
 
-All rules use the same environment, hence don't start the workflow with `--use-conda`, instead just load the environment first before running `snakemake`.
+All rules use the same environment, hence it's best to just load the environment first before running `snakemake`, and avoid using `--use-conda` or `--sdm conda`.

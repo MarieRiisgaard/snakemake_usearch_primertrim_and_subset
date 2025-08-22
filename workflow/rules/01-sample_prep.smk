@@ -99,8 +99,6 @@ rule sample_prep:
         echo "*** Calculating total number of reads after filtering"
         num_reads=$(grep -c '^+$' {output.fastq_filtered})
         echo "{wildcards.sample},$num_reads" > "{output.totalfilteredreads_file}"
-
-        # filter primer sequences?
         """
 
 
