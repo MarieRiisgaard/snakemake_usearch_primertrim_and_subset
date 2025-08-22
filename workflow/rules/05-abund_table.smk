@@ -71,6 +71,7 @@ rule merge_abund_tables:
                 -output "{output}"
         """
 
+
 rule rarefy_abund_table:
     input:
         os.path.join(config["output_dir"], "abund_table.tsv"),
