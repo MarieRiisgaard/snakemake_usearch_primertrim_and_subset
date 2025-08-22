@@ -34,7 +34,6 @@ rule abund_table:
                 -otutabout "{output}" \
                 -threads "{threads}" \
                 -sample_delim "{params.sample_sep}"
-            # sometimes output files are empty and this errors, what to do?!
         """
 
 
@@ -70,9 +69,7 @@ rule merge_abund_tables:
             usearch -otutab_merge \
                 {params.input_csv} \
                 -output "{output}"
-            # this errors if just one file is empty, what to do?!
         """
-
 
 rule rarefy_abund_table:
     input:
@@ -93,11 +90,11 @@ rule rarefy_abund_table:
         "../envs/snakemake_usearch.yml"
     threads: 1
     params:
-        rarefy=config["rarefy"],
+        rarefy_sample_size=config["rarefy_sample_size"],
     shell:
         """
         exec &> "{log}"
         set -euxo pipefail
 
-        usearch -otutab_rare {input} -sample_size {params.rarefy} -output {output}
+        usearch -otutab_rare {input} -sample_size {params.rarefy_sample_size} -output {output}
         """

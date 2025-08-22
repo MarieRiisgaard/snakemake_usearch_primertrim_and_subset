@@ -34,6 +34,12 @@ rule concat_all:
         set -euxo pipefail
         
         cat {input} > {output}
+
+        # error if output file is empty
+        if [ ! -s "{output}" ]; then
+            echo "output file {output} is empty, exiting!"
+            exit 1
+        fi
       """
 
 
@@ -74,6 +80,12 @@ rule trim_primers:
         cutadapt -g {params.primers} \
           --revcomp \
           -o {output} --discard-untrimmed {input} -j {threads}
+
+        # error if output file is empty
+        if [ ! -s "{output}" ]; then
+            echo "output file {output} is empty, exiting!"
+            exit 1
+        fi
         """
 
 
@@ -127,6 +139,12 @@ rule derep:
           -threads {threads} \
           -minuniquesize {params.derep_minsize} \
           -relabel Uniq
+
+        # error if output file is empty
+        if [ ! -s "{output}" ]; then
+            echo "output file {output} is empty, exiting!"
+            exit 1
+        fi
       """
 
 
@@ -164,4 +182,10 @@ rule unoise:
           -zotus {output} \
           -sizeout \
           -minsize {params.unoise_minsize}
+
+        # error if output file is empty
+        if [ ! -s "{output}" ]; then
+            echo "output file {output} is empty, exiting!"
+            exit 1
+        fi
     """

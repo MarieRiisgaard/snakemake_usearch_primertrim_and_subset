@@ -31,4 +31,10 @@ rule sintax:
           -sintax_cutoff 0.8 \
           -threads "{threads}"
         sort -V "{output}" -o "{output}"
+
+        # error if output file is empty
+        if [ ! -s "{output}" ]; then
+            echo "output file {output} is empty, exiting!"
+            exit 1
+        fi
       """
