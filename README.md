@@ -21,5 +21,3 @@ Requirements are listed in `environment.yml`. To create as a conda environment s
 ```
 conda env create --file environment.yml -n snakemake_usearch
 ```
-
-All rules use the same environment, hence it's best to just load the environment first before running `snakemake`, and avoid using `--use-conda` or `--sdm conda`.
