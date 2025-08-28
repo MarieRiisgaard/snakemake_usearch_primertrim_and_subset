@@ -1,5 +1,5 @@
 # snakemake_usearch
-Simple snakemake pipeline based on the standard [usearch11 SOP](https://drive5.com/usearch/manual/uparse_pipeline.html).
+Simple snakemake workflow based on the standard [usearch11 SOP](https://drive5.com/usearch/manual/uparse_pipeline.html).
 
 ## Usage
 First install snakemake and the required software into a conda environment or use the container as described below. Then run using fx:
