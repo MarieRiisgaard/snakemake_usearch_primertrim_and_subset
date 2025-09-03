@@ -20,7 +20,7 @@ rule concat_all:
     message:
         "Concatenating all samples before denoising (generate zOTUs/ASVs)"
     resources:
-        mem_mb=512,
+        mem_mb=1024,
         runtime=30,
         cpus_per_task=1,
     container:

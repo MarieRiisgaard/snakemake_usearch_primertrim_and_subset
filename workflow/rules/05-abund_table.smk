@@ -12,7 +12,7 @@ rule abund_table:
     log:
         os.path.join(config["log_dir"], "05-abund_table", "abund_table_{sample}.log"),
     message:
-        "Estimating abundances of zOTUs/ASVs in each sample"
+        "{wildcards.sample}: Estimating abundances of zOTUs/ASVs"
     resources:
         mem_mb=1024,  # this needs to be calculated dynamically based on input file size
         runtime=120,
