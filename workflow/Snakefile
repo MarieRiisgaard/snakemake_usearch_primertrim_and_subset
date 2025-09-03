@@ -16,9 +16,9 @@ configfile: "config/config.yaml"
 sample_dirs = [
     sample
     for sample in os.listdir(config["input_dir"])
-    if sample.lower() != "unclassified"
+    if os.path.isdir(os.path.join(config["input_dir"], sample))
+    and "unclassified" not in sample.lower()
 ]
-
 
 # include: "rules/01-cat_fastq.smk"
 # include: "rules/02-qfilter.smk"
