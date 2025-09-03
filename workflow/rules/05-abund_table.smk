@@ -1,5 +1,6 @@
 # MUUUCH faster to do this per sample and merge afterwards
-# usearch -otutab does NOT scale linearly with more threads
+# usearch -otutab does NOT scale linearly with more threads, about 4-5
+# seems to be the sweet spot
 rule abund_table:
     input:
         zotus=os.path.join(config["output_dir"], "zOTUs.fa"),

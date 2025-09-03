@@ -65,12 +65,12 @@ rule trim_primers:
     resources:
         mem_mb=2048,
         runtime=120,
-        cpus_per_task=10,
+        cpus_per_task=config["max_threads"],
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
         "../envs/snakemake_usearch.yml"
-    threads: 10
+    threads: config["max_threads"]
     shell:
         """
         exec &> "{log}"
@@ -126,7 +126,7 @@ rule derep:
         "../envs/snakemake_usearch.yml"
     params:
         derep_minsize=config["derep_minsize"],
-    threads: 4  # this command spends most of the time just reading in the file
+    threads: 4  # this command spends most of the time just reading in the file, increasing isn't beneficial
     shell:
         """
         exec &> "{log}"
