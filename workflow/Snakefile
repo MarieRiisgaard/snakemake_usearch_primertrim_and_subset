@@ -20,6 +20,7 @@ sample_dirs = [
     and "unclassified" not in sample.lower()
 ]
 
+
 # include: "rules/01-cat_fastq.smk"
 # include: "rules/02-qfilter.smk"
 # concat totalreads files here

@@ -130,7 +130,7 @@ rule concatenate_total_reads_files:
     resources:
         mem_mb=512,
         runtime=30,
-        cpus-per-task=1,
+        cpus_per_task=1,
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
