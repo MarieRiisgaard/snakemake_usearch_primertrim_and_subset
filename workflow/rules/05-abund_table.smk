@@ -1,6 +1,6 @@
 # MUUUCH faster to do this per sample and merge afterwards
-# usearch -otutab does NOT scale linearly with more threads, about 4-5
-# seems to be the sweet spot
+# usearch -otutab does NOT scale linearly with more threads
+# more than 16 has diminishing returns
 rule abund_table:
     input:
         zotus=os.path.join(config["output_dir"], "zOTUs.fa"),
@@ -15,13 +15,13 @@ rule abund_table:
         "{wildcards.sample}: Estimating abundances of zOTUs/ASVs"
     resources:
         mem_mb=1024,  # this needs to be calculated dynamically based on input file size
-        runtime=120,
-        cpus_per_task=4,
+        runtime=300,
+        cpus_per_task=lambda wc, input: min(config["max_threads"], 16),
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
         "../envs/snakemake_usearch.yml"
-    threads: 4
+    threads: lambda wc, input: min(config["max_threads"], 16)
     params:
         sample_sep=config["sample_sep"],
     shell:
@@ -52,7 +52,7 @@ rule merge_abund_tables:
         "Merging abundance tables"
     resources:
         mem_mb=2048,
-        runtime=60,
+        runtime=30,
         cpus_per_task=1,
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
