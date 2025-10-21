@@ -1,13 +1,9 @@
 rule subsample_reads:
     input:
-        # All primer-trimmed reads for each sample
-        lambda wildcards: glob.glob(
-            os.path.join(
-                config["tmp_dir"],
-                "02-denoise",
-                wildcards.sample,
-                "*.fastq"
-            )
+        os.path.join(
+            config["tmp_dir"],
+            "02-denoise",
+            "all_samples_filtered_renamed_oriented_trimmed.fastq"
         )
     output:
         summary = os.path.join(config["output_dir"], "subsample", "{sample}", "subsample_summary.tsv")
