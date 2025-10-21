@@ -24,7 +24,7 @@ rule concat_all:
         runtime=30,
         cpus_per_task=1,
     container:
-        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+        "/home/bio.aau.dk/hd95lp/.singularity_cache/snakemake_usearch_main.sif"
     conda:
         "../envs/snakemake_usearch.yml"
     threads: 1
@@ -67,7 +67,7 @@ rule trim_primers:
         runtime=120,
         cpus_per_task=config["max_threads"],
     container:
-        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+        "/home/bio.aau.dk/hd95lp/.singularity_cache/snakemake_usearch_main.sif"
     conda:
         "../envs/snakemake_usearch.yml"
     threads: config["max_threads"]

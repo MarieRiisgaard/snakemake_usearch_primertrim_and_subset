@@ -14,7 +14,7 @@ rule subsample_reads:
     conda:
         "../envs/snakemake_usearch.yml"
     container:
-        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+        "/home/bio.aau.dk/hd95lp/.singularity_cache/snakemake_usearch_main.sif"
     threads: 4
     shell:
         r"""

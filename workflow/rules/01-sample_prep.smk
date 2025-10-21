@@ -63,7 +63,7 @@ rule sample_prep:
         runtime=30,
         cpus_per_task=1,
     container:
-        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+        "/home/bio.aau.dk/hd95lp/.singularity_cache/snakemake_usearch_main.sif"
     conda:
         "../envs/snakemake_usearch.yml"
     params:
@@ -132,7 +132,7 @@ rule concatenate_total_reads_files:
         runtime=30,
         cpus_per_task=1,
     container:
-        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+        "/home/bio.aau.dk/hd95lp/.singularity_cache/snakemake_usearch_main.sif"
     conda:
         "../envs/snakemake_usearch.yml"
     threads: 1
