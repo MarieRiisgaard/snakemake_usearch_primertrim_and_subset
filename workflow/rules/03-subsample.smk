@@ -14,7 +14,7 @@ rule subsample_reads:
     conda:
         "../envs/snakemake_usearch.yml"
     container:
-        "/home/bio.aau.dk/hd95lp/.singularity_cache/snakemake_usearch_main.sif"
+        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     threads: 4
     shell:
         r"""
@@ -40,7 +40,7 @@ rule subsample_reads:
             mkdir -p $subsample_dir
             subsample_file=$subsample_dir/{wildcards.sample}_subsampled_${{size}}.fastq
 
-            usearch11 -fastx_subsample $concat_file \
+            usearch -fastx_subsample $concat_file \
                 -sample_size $size \
                 -fastqout $subsample_file \
                 -randseed 42 \
