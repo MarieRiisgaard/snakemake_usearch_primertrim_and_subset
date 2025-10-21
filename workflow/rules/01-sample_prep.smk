@@ -72,15 +72,19 @@ rule sample_prep:
     threads: 1
     message:
         "{wildcards.sample}: Filtering and preparing reads"
-    shell:
+    shell:  
         """
         exec &> "{log}"
         set -euxo pipefail
-        
-        # decompress only if compressed, but concatenate regardless
+
+        # Decompress only if compressed (.gz), otherwise just copy (EDITED FROM KSA version)
         echo "*** Decompressing and concatenating fastq files"
-        gunzip -cdfq {input} > {output.fastq}
-        
+        if [[ "{input}" == *.gz ]]; then
+            gunzip -cdfq {input} > {output.fastq}
+        else
+            cat {input} > {output.fastq}
+        fi
+
         # calc total number of reads, TODO: count "+" lines instead
         echo "*** Calculating total number of reads before any filtering"
         num_reads=$(grep -c '^+$' {output.fastq})
@@ -88,10 +92,10 @@ rule sample_prep:
 
         echo "*** Renaming reads with sample name"
         usearch -fastx_relabel \
-          "{output.fastq}" \
-          -prefix "{wildcards.sample}{params.sample_sep}" \
-          -fastqout "{output.sample_renamed}"
-        
+        "{output.fastq}" \
+        -prefix "{wildcards.sample}{params.sample_sep}" \
+        -fastqout "{output.sample_renamed}"
+
         echo "*** Filtering reads with Filtlong"
         filtlong {params.filtlong_args} {output.sample_renamed} > {output.fastq_filtered}
 
