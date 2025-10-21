@@ -26,19 +26,32 @@ sample_dirs = [
 # concat totalreads files here
 # include: "rules/03-rename_samples.smk"
 include: "rules/01-sample_prep.smk"
-include: "rules/02-denoise.smk"
+include: "rules/02-primertrim.smk"
+include: "rules/03-subsample.smk"
+
+# include: "rules/02-denoise.smk"
 # include: "rules/03-rename_known_zotus.smk"
-include: "rules/04-sintax.smk"
-include: "rules/05-abund_table.smk"
+# include: "rules/04-sintax.smk"
+# include: "rules/05-abund_table.smk"
 
 
 rule all:
     input:
-        os.path.join(config["output_dir"], "zOTUs.fa"),
-        os.path.join(config["output_dir"], "zOTUs.sintax"),
-        os.path.join(config["output_dir"], "abund_table.tsv"),
-        os.path.join(config["output_dir"], "totalreads.csv"),
-        os.path.join(config["output_dir"], "totalreads_filtered.csv"),
-        os.path.join(config["output_dir"], "abund_table_rarefied.tsv")
-        if config["rarefy_abund_table"]
-        else [],
+        expand(
+            os.path.join(config["output_dir"], "subsample", "{sample}", "subsample_summary.tsv"),
+            sample=sample_dirs,
+        )
+
+#rule all:
+#    input:
+#        #os.path.join(config["output_dir"], "zOTUs.fa"),
+#        #os.path.join(config["output_dir"], "zOTUs.sintax"),
+#        #os.path.join(config["output_dir"], "abund_table.tsv"),
+#        os.path.join(config["output_dir"], "totalreads.csv"),
+#        os.path.join(config["output_dir"], "totalreads_filtered.csv"),
+#        os.path.join(config["output_dir"], "totalreads_filtered.csv"), # need to add output eg. all the reads after filtering primers
+#        os.path.join(config["output_dir"], "totalreads_filtered.csv"), # # need to add output eg. all the reads after filtering and subsampling
+#        #os.path.join(config["output_dir"], "abund_table_rarefied.tsv")
+#        #if config["rarefy_abund_table"]
+#        #else [],
+#
