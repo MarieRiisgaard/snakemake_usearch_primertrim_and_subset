@@ -13,3 +13,4 @@ sample_sep: "_"
 primers: "AGRGTTYGATYMTGGCTCAG...GTTTGGCACCTCGATGTCG"
 derep_minsize: 2
 unoise_minsize: 8
+# reference_amplicons: If you don’t want this step to run, simply leave it blank or comment it out: EG. /home/bio.aau.dk/hd95lp/Projects/RETHINK/p_nanopore_amplicon/1_data/zymo_communities/Zmock/reference_amplicons/V4_bacterial_amplicons.fa
