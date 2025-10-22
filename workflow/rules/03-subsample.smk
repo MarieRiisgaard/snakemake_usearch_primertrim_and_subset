@@ -79,25 +79,38 @@ rule merge_subsample_summaries:
         exec &> "{log}"
         set -euxo pipefail
 
-        echo -e "Sample\tSubsample_size\tReads_total\tReads_subsampled" > {output}
+        echo -e "Sample\tSubsample_size\tReads_total\tReads_trimmed\tReads_subsampled" > {output}
+        echo "Samples: {params.sample_list}"
+        echo "Sizes: {params.sizes}"
 
         for sample in {params.sample_list}; do
-            input_file={config[tmp_dir]}/02-denoise/${{sample}}/${{sample}}_trimmed.fastq
-            if [ ! -s "$input_file" ]; then
-                echo "⚠️  Skipping $sample — no trimmed file found."
-                continue
+            # ----- Total reads BEFORE primer trimming -----
+            reads_total_file={config[tmp_dir]}/totalreads/${{sample}}_totalreads.csv
+            if [ -s "$reads_total_file" ]; then
+                reads_total=$(awk -F',' 'NR==2 {print $2}' "$reads_total_file" || echo 0)
+            else
+                echo "⚠️  No total reads file for $sample"
+                reads_total=0
             fi
 
-            nreads=$(grep -c '^+$' "$input_file" || true)
+            # ----- Reads AFTER primer trimming -----
+            reads_trimmed_file={config[tmp_dir]}/totalreads_trimmed/${{sample}}_totaltrimmedreads.csv
+            if [ -s "$reads_trimmed_file" ]; then
+                reads_trimmed=$(awk -F',' 'NR==2 {print $2}' "$reads_trimmed_file" || echo 0)
+            else
+                echo "⚠️  No trimmed reads file for $sample"
+                reads_trimmed=0
+            fi
 
+            # ----- Subsampled reads for each size -----
             for size in {params.sizes}; do
                 subsample_file={config[output_dir]}/subsample/sample_size_${{size}}/${{sample}}_subsampled_${{size}}.fastq
                 if [ -s "$subsample_file" ]; then
-                    reads_after=$(grep -c '^+$' "$subsample_file" || true)
+                    reads_subsampled=$(grep -c '^+$' "$subsample_file" || true)
                 else
-                    reads_after=0
+                    reads_subsampled=0
                 fi
-                echo -e "${{sample}}\t${{size}}\t${{nreads}}\t${{reads_after}}" >> {output}
+                echo -e "${{sample}}\t${{size}}\t${{reads_total}}\t${{reads_trimmed}}\t${{reads_subsampled}}" >> {output}
             done
         done
         """
