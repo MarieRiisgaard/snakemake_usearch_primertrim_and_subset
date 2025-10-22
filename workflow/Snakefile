@@ -2,6 +2,7 @@
 # Please follow the best practices:
 # https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
 # in particular regarding the standardized folder structure mentioned there.
+
 import os
 import glob
 from snakemake.utils import min_version
@@ -34,24 +35,13 @@ include: "rules/03-subsample.smk"
 # include: "rules/04-sintax.smk"
 # include: "rules/05-abund_table.smk"
 
-
 rule all:
     input:
         expand(
-            os.path.join(config["output_dir"], "subsample", "{sample}", "subsample_summary.tsv"),
+            [
+                os.path.join(config["tmp_dir"], "totalreads", "{sample}_totalreads.csv"),
+                os.path.join(config["tmp_dir"], "totalreads_trimmed", "{sample}_totaltrimmedreads.csv"),
+                os.path.join(config["output_dir"], "subsample", "subsample_summary.tsv"),
+            ],
             sample=sample_dirs,
         )
-
-#rule all:
-#    input:
-#        #os.path.join(config["output_dir"], "zOTUs.fa"),
-#        #os.path.join(config["output_dir"], "zOTUs.sintax"),
-#        #os.path.join(config["output_dir"], "abund_table.tsv"),
-#        os.path.join(config["output_dir"], "totalreads.csv"),
-#        os.path.join(config["output_dir"], "totalreads_filtered.csv"),
-#        os.path.join(config["output_dir"], "totalreads_filtered.csv"), # need to add output eg. all the reads after filtering primers
-#        os.path.join(config["output_dir"], "totalreads_filtered.csv"), # # need to add output eg. all the reads after filtering and subsampling
-#        #os.path.join(config["output_dir"], "abund_table_rarefied.tsv")
-#        #if config["rarefy_abund_table"]
-#        #else [],
-#

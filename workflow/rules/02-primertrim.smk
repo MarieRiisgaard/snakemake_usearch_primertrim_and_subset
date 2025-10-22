@@ -1,94 +1,164 @@
-rule concat_all:
-    input:
-        expand(
-            os.path.join(
-                config["tmp_dir"],
-                "01-sample_prep",
-                "{sample}",
-                "{sample}_filtered_renamed.fastq",
-            ),
-            sample=sample_dirs,
-        ),
-    output:
-        temp(
-            os.path.join(
-                config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed.fastq"
-            )
-        ),
-    log:
-        os.path.join(config["log_dir"], "02-denoise", "concat_all.log"),
-    message:
-        "Concatenating all samples before denoising (generate zOTUs/ASVs)"
-    resources:
-        mem_mb=1024,
-        runtime=30,
-        cpus_per_task=1,
-    container:
-        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
-    conda:
-        "../envs/snakemake_usearch.yml"
-    threads: 1
-    shell:
-        """
-        exec &> "{log}"
-        set -euxo pipefail
-        
-        cat {input} > {output}
+###############################################
+# 02-primertrim.smk — per-barcode trimming
+###############################################
 
-        # error if output file is empty
-        if [ ! -s "{output}" ]; then
-            echo "output file {output} is empty, exiting!"
-            exit 1
-        fi
-      """
-
-
+# --- Per-barcode primer trimming ---
 rule trim_primers:
     input:
         os.path.join(
-            config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed.fastq"
+            config["tmp_dir"],
+            "01-sample_prep",
+            "{sample}",
+            "{sample}_filtered_renamed.fastq",
         ),
     output:
-        temp(
-            os.path.join(
-                config["tmp_dir"],
-                "02-denoise",
-                "all_samples_filtered_renamed_oriented_trimmed.fastq",
-            )
+        fastq_trimmed=os.path.join(
+            config["tmp_dir"],
+            "02-denoise",
+            "{sample}",
+            "{sample}_trimmed.fastq",
+        ),
+        reads_trimmed=os.path.join(
+            config["tmp_dir"],
+            "totalreads_trimmed",
+            "{sample}_totaltrimmedreads.csv",
         ),
     log:
-        os.path.join(config["log_dir"], "02-denoise", "trim_primers.log"),
+        os.path.join(config["log_dir"], "02-denoise", "trim_primers_{sample}.log"),
     params:
         primers=config["primers"],
     message:
-        "Orienting and trimming reads according to primers"
+        "Trimming primers for {wildcards.sample}",
     resources:
         mem_mb=2048,
         runtime=120,
         cpus_per_task=config["max_threads"],
     container:
-        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+        "docker://ghcr.io/kasperskytte/snakemake_usearch:main",
     conda:
-        "../envs/snakemake_usearch.yml"
-    threads: config["max_threads"]
+        "../envs/snakemake_usearch.yml",
+    threads: config["max_threads"],
     shell:
         """
         exec &> "{log}"
         set -euxo pipefail
 
-        # this step both orients and trims at once
+        echo "*** Primer trimming for {wildcards.sample}"
+
+        # orient + trim with cutadapt
         cutadapt -g {params.primers} \
-          --revcomp \
-          -o {output} --discard-untrimmed {input} -j {threads}
+            --revcomp \
+            -o {output.fastq_trimmed} \
+            --discard-untrimmed {input} \
+            -j {threads}
 
         # error if output file is empty
-        if [ ! -s "{output}" ]; then
-            echo "output file {output} is empty, exiting!"
+        if [ ! -s "{output.fastq_trimmed}" ]; then
+            echo "output file {output.fastq_trimmed} is empty, exiting!"
             exit 1
         fi
+
+        # calculate total number of reads after trimming
+        num_reads=$(grep -c '^+$' {output.fastq_trimmed})
+        echo "{wildcards.sample},$num_reads" > "{output.reads_trimmed}"
         """
 
+###############################################
+# End of file
+###############################################
 
+
+#rule concat_all:
+#    input:
+#        expand(
+#            os.path.join(
+#                config["tmp_dir"],
+#                "01-sample_prep",
+#                "{sample}",
+#                "{sample}_filtered_renamed.fastq",
+#            ),
+#            sample=sample_dirs,
+#        ),
+#    output:
+#        temp(
+#            os.path.join(
+#                config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed.fastq"
+#            )
+#        ),
+#    log:
+#        os.path.join(config["log_dir"], "02-denoise", "concat_all.log"),
+#    message:
+#        "Concatenating all samples before denoising (generate zOTUs/ASVs)"
+#    resources:
+#        mem_mb=1024,
+#        runtime=30,
+#        cpus_per_task=1,
+#    container:
+#        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+#    conda:
+#        "../envs/snakemake_usearch.yml"
+#    threads: 1
+#    shell:
+#        """
+#        exec &> "{log}"
+#        set -euxo pipefail
+#        
+#        cat {input} > {output}
+#
+#        # error if output file is empty
+#        if [ ! -s "{output}" ]; then
+#            echo "output file {output} is empty, exiting!"
+#            exit 1
+#        fi
+#      """
+#
+#
+#rule trim_primers:
+#    input:
+#        os.path.join(
+#            config["tmp_dir"], "02-denoise", "all_samples_filtered_renamed.fastq"
+#        ),
+#    output:
+#        temp(
+#            os.path.join(
+#                config["tmp_dir"],
+#                "02-denoise",
+#                "all_samples_filtered_renamed_oriented_trimmed.fastq",
+#            )
+#        ),
+#    log:
+#        os.path.join(config["log_dir"], "02-denoise", "trim_primers.log"),
+#    params:
+#        primers=config["primers"],
+#    message:
+#        "Orienting and trimming reads according to primers"
+#    resources:
+#        mem_mb=2048,
+#        runtime=120,
+#        cpus_per_task=config["max_threads"],
+#    container:
+#        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+#    conda:
+#        "../envs/snakemake_usearch.yml"
+#    threads: config["max_threads"]
+#    shell:
+#        """
+#        exec &> "{log}"
+#        set -euxo pipefail
+#
+#        # this step both orients and trims at once
+#        cutadapt -g {params.primers} \
+#          --revcomp \
+#          -o {output} --discard-untrimmed {input} -j {threads}
+#
+#        # error if output file is empty
+#        if [ ! -s "{output}" ]; then
+#            echo "output file {output} is empty, exiting!"
+#            exit 1
+#        fi
+#        """
+#
+#
 # according to Edgar QC filtering should be done here, not in sample_prep
 # rule qc_filter:
 #   shell:
