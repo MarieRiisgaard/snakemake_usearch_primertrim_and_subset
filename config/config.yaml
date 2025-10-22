@@ -6,8 +6,10 @@ tmp_dir: "tmp"
 log_dir: "logs"
 # to skip filtering altogether set to "--min_length 1"
 filtlong_args: "--min_length 1"
+db_sintax: "/databases/midas/MiDAS5.3_20240320/FLASVs_w_sintax.fa"
 subsample_sizes: [10000, 20000, 50000, 100000, 200000]
 max_threads: 32
 sample_sep: "_"
 primers: "AGRGTTYGATYMTGGCTCAG...GTTTGGCACCTCGATGTCG"
-
+derep_minsize: 2
+unoise_minsize: 8

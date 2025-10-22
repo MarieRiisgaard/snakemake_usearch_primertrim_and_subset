@@ -2,56 +2,59 @@
 # 03-subsample.smk — unified structure with one summary file
 ###############################################################
 
-# Subsample each barcode individually
+# Subsample each barcode individually for each size and also copy full reads
 rule subsample_reads:
     input:
         os.path.join(config["tmp_dir"], "02-denoise", "{sample}", "{sample}_trimmed.fastq")
     output:
-        os.path.join(
+        subsampled=os.path.join(
             config["output_dir"],
             "subsample",
             "sample_size_{size}",
             "{sample}_subsampled_{size}.fastq"
+        ),
+        all_reads=os.path.join(
+            config["output_dir"],
+            "subsample",
+            "all_reads",
+            "{sample}_trimmed_{size}.fastq"   # <-- add size for Snakemake consistency
         )
-    params:
-        sizes=config.get("subsample_sizes", [1000, 2000, 5000, 10000])
     log:
         os.path.join(config["log_dir"], "03-subsample", "{sample}_{size}.log")
+    params:
+        sizes=config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000, 400000])
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
         "../envs/snakemake_usearch.yml"
     threads: 2
     message:
-        "Subsampling {wildcards.sample} to multiple depths"
+        "Subsampling {wildcards.sample} to size {wildcards.size}"
     shell:
         r"""
         exec &> "{log}"
         set -euxo pipefail
 
         mkdir -p {config[output_dir]}/subsample/all_reads
-        cp {input} {config[output_dir]}/subsample/all_reads/{wildcards.sample}_trimmed.fastq
+        cp {input} {output.all_reads}
 
         input_file={input}
         nreads=$(grep -c '^+$' "$input_file" || true)
 
-        for size in {params.sizes}; do
-            if [ "$nreads" -lt "$size" ]; then
-                echo "⚠️  {wildcards.sample}: not enough reads ($nreads) for size $size, skipping..."
-                continue
-            fi
+        size={wildcards.size}
+        if [ "$nreads" -lt "$size" ]; then
+            echo "⚠️  {wildcards.sample}: not enough reads ($nreads) for size $size, skipping..."
+            exit 0
+        fi
 
-            subsample_dir={config[output_dir]}/subsample/sample_size_${{size}}
-            mkdir -p $subsample_dir
+        subsample_dir={config[output_dir]}/subsample/sample_size_${{size}}
+        mkdir -p $subsample_dir
 
-            subsample_file=$subsample_dir/{wildcards.sample}_subsampled_${{size}}.fastq
-
-            usearch -fastx_subsample "$input_file" \
-                -sample_size $size \
-                -fastqout "$subsample_file" \
-                -randseed 42 \
-                -quiet
-        done
+        usearch -fastx_subsample "$input_file" \
+            -sample_size $size \
+            -fastqout {output.subsampled} \
+            -randseed 42 \
+            -quiet
         """
 
 
@@ -87,7 +90,7 @@ rule merge_subsample_summaries:
             # ----- Total reads BEFORE primer trimming -----
             reads_total_file={config[tmp_dir]}/totalreads/${{sample}}_totalreads.csv
             if [ -s "$reads_total_file" ]; then
-                reads_total=$(awk -F',' 'NR==2 {print $2}' "$reads_total_file" || echo 0)
+                reads_total=$(awk -F',' 'NR==2 {{print $2}}' "$reads_total_file" || echo 0)
             else
                 echo "⚠️  No total reads file for $sample"
                 reads_total=0
@@ -96,7 +99,7 @@ rule merge_subsample_summaries:
             # ----- Reads AFTER primer trimming -----
             reads_trimmed_file={config[tmp_dir]}/totalreads_trimmed/${{sample}}_totaltrimmedreads.csv
             if [ -s "$reads_trimmed_file" ]; then
-                reads_trimmed=$(awk -F',' 'NR==2 {print $2}' "$reads_trimmed_file" || echo 0)
+                reads_trimmed=$(awk -F',' 'NR==2 {{print $2}}' "$reads_trimmed_file" || echo 0)
             else
                 echo "⚠️  No trimmed reads file for $sample"
                 reads_trimmed=0

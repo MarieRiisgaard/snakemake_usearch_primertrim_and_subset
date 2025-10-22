@@ -29,19 +29,48 @@ sample_dirs = [
 include: "rules/01-sample_prep.smk"
 include: "rules/02-primertrim.smk"
 include: "rules/03-subsample.smk"
+include: "rules/04-denoise.smk"
+include: "rules/05-sintax.smk"
 
 # include: "rules/02-denoise.smk"
 # include: "rules/03-rename_known_zotus.smk"
-# include: "rules/04-sintax.smk"
 # include: "rules/05-abund_table.smk"
+
+# Define subsets outside any rule
+subset_dirs = ["all_reads"] + [
+    f"sample_size_{s}"
+    for s in config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000, 400000])
+]
+
 
 rule all:
     input:
+        # --- Pre-subsampling statistics ---
         expand(
-            [
-                os.path.join(config["tmp_dir"], "totalreads", "{sample}_totalreads.csv"),
-                os.path.join(config["tmp_dir"], "totalreads_trimmed", "{sample}_totaltrimmedreads.csv"),
-                os.path.join(config["output_dir"], "subsample", "subsample_summary.tsv"),
-            ],
+            os.path.join(config["tmp_dir"], "totalreads", "{sample}_totalreads.csv"),
+            sample=sample_dirs
+        ),
+        expand(
+            os.path.join(config["tmp_dir"], "totalreads_trimmed", "{sample}_totaltrimmedreads.csv"),
+            sample=sample_dirs
+        ),
+
+        # --- Subsampling outputs ---
+        expand(
+            os.path.join(config["output_dir"], "subsample", "sample_size_{size}", "{sample}_subsampled_{size}.fastq"),
             sample=sample_dirs,
+            size=config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000, 400000])
+        ),
+        os.path.join(config["output_dir"], "subsample", "subsample_summary.tsv"),
+
+        # --- Denoising outputs ---
+        expand(
+            os.path.join(config["output_dir"], "04-denoise", "{subset}", "zOTUs.fa"),
+            subset=subset_dirs
+        ),
+
+        # --- Taxonomy assignment ---
+        expand(
+            os.path.join(config["output_dir"], "05-sintax", "{subset}", "zOTUs.sintax"),
+            subset=subset_dirs
         )
