@@ -82,7 +82,7 @@ rule merge_subsample_summaries:
         echo -e "Sample\tSubsample_size\tReads_total\tReads_subsampled" > {output}
 
         for sample in {params.sample_list}; do
-            input_file={config[tmp_dir]}/02-primertrim/${{sample}}/${{sample}}_trimmed.fastq
+            input_file={config[tmp_dir]}/02-denoise/${{sample}}/${{sample}}_trimmed.fastq
             if [ ! -s "$input_file" ]; then
                 echo "⚠️  Skipping $sample — no trimmed file found."
                 continue
