@@ -90,7 +90,7 @@ rule merge_subsample_summaries:
             # ----- Total reads BEFORE primer trimming -----
             reads_total_file={config[tmp_dir]}/totalreads/${{sample}}_totalreads.csv
             if [ -s "$reads_total_file" ]; then
-                reads_total=$(awk -F',' 'NR==2 {{print $2}}' "$reads_total_file" || echo 0)
+                reads_total=$(awk -F',' 'NR==1 {{print $2}}' "$reads_total_file" || echo 0)
             else
                 echo "⚠️  No total reads file for $sample"
                 reads_total=0
@@ -99,7 +99,7 @@ rule merge_subsample_summaries:
             # ----- Reads AFTER primer trimming -----
             reads_trimmed_file={config[tmp_dir]}/totalreads_trimmed/${{sample}}_totaltrimmedreads.csv
             if [ -s "$reads_trimmed_file" ]; then
-                reads_trimmed=$(awk -F',' 'NR==2 {{print $2}}' "$reads_trimmed_file" || echo 0)
+                reads_trimmed=$(awk -F',' 'NR==1 {{print $2}}' "$reads_trimmed_file" || echo 0)
             else
                 echo "⚠️  No trimmed reads file for $sample"
                 reads_trimmed=0

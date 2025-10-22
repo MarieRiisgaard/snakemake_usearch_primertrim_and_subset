@@ -45,7 +45,11 @@ rule concat_subsample:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
         "../envs/snakemake_usearch.yml"
-    threads: 1
+    resources:
+        mem_mb=64000,   # 64 GB; adjust as needed
+        runtime=180,    # minutes
+        cpus_per_task=2
+    threads: 2
     shell:
         r"""
         exec &> "{log}"
