@@ -28,21 +28,32 @@ rule sintax:
         total_before=$(grep -c "^>" "{input}" || true)
 
         # --- Clean and filter sequences ---
-        awk 'BEGIN{{RS=">"; ORS=""}} 
-            NR>1 {{
-                header=$1; seq=$0; gsub("\n","",seq);
-                if(length(seq) >= {params.minlen}) print ">"header
-            }}' "{input}" > "{input}.filtered"
-
-        total_after=$(grep -c "^>" "{input}.filtered" || true)
-        removed=$(( total_before - total_after ))
-
-        echo "Total zOTUs before filtering: $total_before"
-        echo "Total zOTUs after filtering:  $total_after"
-        echo "Removed $removed sequences shorter than {params.minlen} bp"
-
-        # Replace input with filtered file
-        mv "{input}.filtered" "{input}" 
+        awk -v minlen={params.minlen} '
+            BEGIN { 
+                header = ""; seq = "" 
+            }
+            /^>/ {
+                # If there is a previous record, process it
+                if (header != "") {
+                    if (length(seq) >= minlen)
+                        print header "\n" seq
+                }
+                # Start new record
+                header = $0
+                seq = ""
+                next
+            }
+            {
+                # Add sequence line (remove spaces, just in case)
+                gsub(/[^A-Za-z]/, "", $0)
+                seq = seq $0
+            }
+            END {
+                # Process last record
+                if (header != "" && length(seq) >= minlen)
+                    print header "\n" seq
+            }
+        ' "{input}" > "{input}.filtered"
 
         # --- Run SINTAX classification ---
         usearch -sintax \
