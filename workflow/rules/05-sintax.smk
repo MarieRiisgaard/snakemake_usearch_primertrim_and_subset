@@ -20,26 +20,54 @@ rule sintax_subset:
         "../envs/snakemake_usearch.yml"
     threads: config["max_threads"]
     params:
-        db=config["db_sintax"]
+        db=config["db_sintax"],
+        minlen=config.get("minlen", 100)
     shell:
-        r"""
+        """
         exec &> "{log}"
         set -euxo pipefail
-
-        mkdir -p $(dirname {output})
-
+    
+        echo "Filtering zOTUs shorter than {params.minlen} bp before SINTAX"
+    
+        total_before=$(grep -c "^>" "{input}" || true)
+    
+        awk -v minlen={params.minlen} '
+            BEGIN {{
+                header = ""; seq = ""
+            }}
+            /^>/ {{
+                if (header != "") {{
+                    if (length(seq) >= minlen)
+                        print header "\\n" seq
+                }}
+                header = $0
+                seq = ""
+                next
+            }}
+            {{
+                gsub(/[^A-Za-z]/, "", $0)
+                seq = seq $0
+            }}
+            END {{
+                if (header != "" && length(seq) >= minlen)
+                    print header "\\n" seq
+            }}
+        ' "{input}" > "{input}.filtered"
+    
         usearch -sintax \
-          "{input}" \
-          -db "{params.db}" \
-          -tabbedout "{output}" \
-          -strand both \
-          -sintax_cutoff 0.8 \
-          -threads {threads}
-
+            "{input}.filtered" \
+            -db "{params.db}" \
+            -tabbedout "{output}" \
+            -strand both \
+            -sintax_cutoff 0.8 \
+            -threads "{threads}"
+    
         sort -V "{output}" -o "{output}"
-
+    
         if [ ! -s "{output}" ]; then
             echo "output file {output} is empty, exiting!"
             exit 1
         fi
+    
+        echo "✅ SINTAX completed successfully for {wildcards.subset}"
         """
