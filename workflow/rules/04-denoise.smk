@@ -86,13 +86,17 @@ rule derep_subset:
         os.path.join(config["log_dir"], "04-denoise", "{subset}_derep.log")
     message:
         "Dereplicating subset {wildcards.subset}"
+    resources:
+        mem_mb=lambda wc, input: max(1.5 * input.size_mb, 4096),  # a 64GB file took 72GB mem
+        runtime=600,
+        cpus_per_task=4,
     params:
         derep_minsize=config["derep_minsize"]
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
         "../envs/snakemake_usearch.yml"
-    threads: 4
+    threads: 4 # this command spends most of the time just reading in the file, increasing isn't beneficial
     shell:
         r"""
         exec &> "{log}"
