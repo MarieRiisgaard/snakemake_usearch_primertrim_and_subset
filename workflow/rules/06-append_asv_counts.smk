@@ -45,7 +45,7 @@ rule append_asv_counts:
             else
                 n_asv=0
             fi
-            echo -e "${subset}\t${n_asv}" >> "$tmp_counts"
+            echo -e "${{subset}}\t${{n_asv}}" >> "$tmp_counts"
         done
     
         # --- Prepare reference match report ---
@@ -62,61 +62,61 @@ rule append_asv_counts:
                         -db "{params.reference_amplicons}" \
                         -id 0.95 \
                         -strand both \
-                        -userout "${zotus_file}_refmatches.txt" \
+                        -userout "${{zotus_file}}_refmatches.txt" \
                         -userfields query+target+id \
                         -quiet \
                         -maxaccepts 0 -maxrejects 0 \
                         -top_hits_only no || true
     
-                    n_match=$(awk '$3==1.0' "${zotus_file}_refmatches.txt" | wc -l || echo 0)
+                    n_match=$(awk '$3==1.0' "${{zotus_file}}_refmatches.txt" | wc -l || echo 0)
     
-                    if [ -s "${zotus_file}_refmatches.txt" ]; then
-                        awk -v subset="$subset" '{print subset"\t"$1"\t"$2"\t"$3}' "${zotus_file}_refmatches.txt" >> "{output.detailed_matches}"
+                    if [ -s "${{zotus_file}}_refmatches.txt" ]; then
+                        awk -v subset="$subset" '{{{{print subset"\t"$1"\t"$2"\t"$3}}}}' "${{zotus_file}}_refmatches.txt" >> "{output.detailed_matches}"
                     fi
                 else
                     n_match=0
                 fi
-                echo -e "${subset}\t${n_match}" >> "$tmp_ref"
+                echo -e "${{subset}}\t${{n_match}}" >> "$tmp_ref"
             done
         else
             echo "⚠️ No reference_amplicons specified or file missing — skipping identity checks."
             for zotus_file in {input.zotus}; do
                 subset=$(basename "$(dirname "$zotus_file")")
-                echo -e "${subset}\tNA" >> "$tmp_ref"
+                echo -e "${{subset}}\tNA" >> "$tmp_ref"
             done
         fi
     
         # --- Merge ASV counts + reference matches + all_reads data ---
         awk -v FS="\t" -v OFS="\t" -v cnt="$tmp_counts" -v ref="$tmp_ref" '
-        BEGIN {
-            while ((getline line < cnt) > 0) {
+        BEGIN {{{{
+            while ((getline line < cnt) > 0) {{{{
                 if (line ~ /^Subset/) continue
                 split(line, f, "\t")
                 a[f[1]] = f[2]
-            }
+            }}}}
             close(cnt)
-            while ((getline line < ref) > 0) {
+            while ((getline line < ref) > 0) {{{{
                 if (line ~ /^Subset/) continue
                 split(line, f, "\t")
                 r[f[1]] = f[2]
-            }
+            }}}}
             close(ref)
     
             all_asv = (("all_reads" in a) ? a["all_reads"] : 0)
             all_ref = (("all_reads" in r) ? r["all_reads"] : "NA")
-        }
-        NR == 1 {
+        }}}}
+        NR == 1 {{{{
             print $0, "ASVs", "ASV_ref_matches", "All_reads_ASVs", "All_reads_ref_matches"
             next
-        }
-        /^barcode/ {
+        }}}}
+        /^barcode/ {{{{
             subset = "sample_size_" $2
             asv = (subset in a ? a[subset] : 0)
             refv = (subset in r ? r[subset] : (("all_reads" in r) ? r["all_reads"] : "NA"))
             print $0, asv, refv, all_asv, all_ref
             next
-        }
-        {print}
+        }}}}
+        {{{{print}}}}
         ' "{input.summary}" > "{output.summary_with_asvs}"
     
         rm "$tmp_counts" "$tmp_ref"
