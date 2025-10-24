@@ -57,11 +57,11 @@ rule all:
         ),
 
         # --- Subsampling outputs ---
-        expand(
-            os.path.join(config["output_dir"], "subsample", "sample_size_{size}", "{sample}_subsampled_{size}.fastq"),
-            sample=sample_dirs,
-            size=config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000, 400000])
-        ),
+        #expand(
+        #    os.path.join(config["output_dir"], "subsample", "sample_size_{size}", "{sample}_subsampled_{size}.fastq"),
+        #    sample=sample_dirs,
+        #    size=config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000, 400000])
+        #),
         os.path.join(config["output_dir"], "subsample", "subsample_summary.tsv"),
 
         # --- Denoising outputs ---

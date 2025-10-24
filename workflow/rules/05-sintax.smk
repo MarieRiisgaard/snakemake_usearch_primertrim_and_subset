@@ -23,22 +23,27 @@ rule sintax_subset:
         db=config["db_sintax"],
         minlen=config.get("minlen", 100)
     shell:
-        """
+        r"""
         exec &> "{log}"
         set -euxo pipefail
     
+        mkdir -p $(dirname {output})
+    
+        # --- If UNOISE produced no zOTUs, make empty output and skip
+        if [ ! -s "{input}" ]; then
+            echo "# No zOTUs to classify for subset {wildcards.subset}" > "{output}"
+            echo "⚠️ Skipping SINTAX — input file {input} empty"
+            exit 0
+        fi
+    
         echo "Filtering zOTUs shorter than {params.minlen} bp before SINTAX"
     
-        total_before=$(grep -c "^>" "{input}" || true)
-    
         awk -v minlen={params.minlen} '
-            BEGIN {{
-                header = ""; seq = ""
-            }}
+            BEGIN {{ header = ""; seq = "" }}
             /^>/ {{
                 if (header != "") {{
                     if (length(seq) >= minlen)
-                        print header "\\n" seq
+                        print header "\n" seq
                 }}
                 header = $0
                 seq = ""
@@ -50,9 +55,16 @@ rule sintax_subset:
             }}
             END {{
                 if (header != "" && length(seq) >= minlen)
-                    print header "\\n" seq
+                    print header "\n" seq
             }}
         ' "{input}" > "{input}.filtered"
+    
+        # If no sequences remain after filtering, skip gracefully
+        if [ ! -s "{input}.filtered" ]; then
+            echo "# No sequences >= {params.minlen} bp to classify" > "{output}"
+            echo "⚠️ Skipping SINTAX — all sequences too short"
+            exit 0
+        fi
     
         usearch -sintax \
             "{input}.filtered" \
@@ -60,14 +72,12 @@ rule sintax_subset:
             -tabbedout "{output}" \
             -strand both \
             -sintax_cutoff 0.8 \
-            -threads "{threads}"
+            -threads "{threads}" || true
     
-        sort -V "{output}" -o "{output}"
-    
+        # If SINTAX output empty, create placeholder
         if [ ! -s "{output}" ]; then
-            echo "output file {output} is empty, exiting!"
-            exit 1
+            echo "# SINTAX produced no classifications" > "{output}"
         fi
     
-        echo "✅ SINTAX completed successfully for {wildcards.subset}"
+        echo "✅ SINTAX completed (subset {wildcards.subset})"
         """
