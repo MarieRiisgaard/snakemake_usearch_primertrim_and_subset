@@ -53,7 +53,9 @@ rule append_asv_counts:
                         -strand both \
                         -userout "${{zotus_file}}_refmatches.txt" \
                         -userfields query+target+id \
-                        -quiet
+                        -quiet \
+                        -maxaccepts 0 -maxrejects 0 \
+                        -top_hits_only no
 
                     # Count full 100% matches
                     n_match=$(awk '$3==1.0' "${{zotus_file}}_refmatches.txt" | wc -l || echo 0)
