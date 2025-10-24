@@ -55,7 +55,7 @@ rule subsample_reads:
 
 rule merge_subsample_summaries:
     input:
-        temp(expand(
+        expand(
             os.path.join(
                 config["output_dir"],
                 "subsample",
@@ -64,7 +64,7 @@ rule merge_subsample_summaries:
             ),
             sample=sample_dirs,
             size=config.get("subsample_sizes", [1000, 2000, 5000, 10000])
-        ))
+        )
     output:
         os.path.join(config["output_dir"], "subsample", "subsample_summary.tsv")
     params:

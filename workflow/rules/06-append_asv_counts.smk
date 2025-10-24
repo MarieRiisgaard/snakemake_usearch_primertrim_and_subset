@@ -5,7 +5,7 @@ rule append_asv_counts:
     input:
         summary=os.path.join(config["output_dir"], "subsample", "subsample_summary.tsv"),
         zotus=expand(
-            os.path.join(config["output_dir"], "04-denoise", "{subset}", "zOTUs.fa"),
+            os.path.join(config["output_dir"], "04-denoise", "{subset}", "zOTUs.fa.filtered"),
             subset=subset_dirs
         )
     output:
@@ -25,9 +25,9 @@ rule append_asv_counts:
         r"""
         exec &> "{log}"
         set -euxo pipefail
-    
+
         mkdir -p $(dirname {output.summary_with_asvs})
-    
+
         # Ensure main summary exists
         if [ ! -s "{input.summary}" ]; then
             echo "⚠️ No subsample summary found. Creating empty outputs."
@@ -35,7 +35,7 @@ rule append_asv_counts:
             echo -e "Subset\tASV_ID\tReference_ID\tIdentity" > "{output.detailed_matches}"
             exit 0
         fi
-    
+
         # --- Collect ASV counts per subset ---
         tmp_counts=$(mktemp)
         echo -e "Subset\tASVs" > "$tmp_counts"
@@ -48,12 +48,12 @@ rule append_asv_counts:
             fi
             echo -e "${{subset}}\t${{n_asv}}" >> "$tmp_counts"
         done
-    
+
         # --- Prepare reference match report ---
         tmp_ref=$(mktemp)
         echo -e "Subset\tASV_ref_matches" > "$tmp_ref"
         echo -e "Subset\tASV_ID\tReference_ID\tIdentity" > "{output.detailed_matches}"
-    
+
         if [ -n "{params.reference_amplicons}" ] && [ -s "{params.reference_amplicons}" ]; then
             echo "Reference file found: {params.reference_amplicons}"
             for zotus_file in {input.zotus}; do
@@ -66,11 +66,10 @@ rule append_asv_counts:
                         -userout "${{zotus_file}}_refmatches.txt" \
                         -userfields query+target+id \
                         -quiet \
-                        -maxaccepts 0 -maxrejects 0 \
-                        -top_hits_only no || true
-    
+                        -maxaccepts 0 -maxrejects 0 
+
                     n_match=$(awk '$3==1.0' "${{zotus_file}}_refmatches.txt" | wc -l || echo 0)
-    
+
                     if [ -s "${{zotus_file}}_refmatches.txt" ]; then
                         awk -v subset="$subset" '{{{{print subset"\t"$1"\t"$2"\t"$3}}}}' "${{zotus_file}}_refmatches.txt" >> "{output.detailed_matches}"
                     fi
@@ -86,7 +85,7 @@ rule append_asv_counts:
                 echo -e "${{subset}}\tNA" >> "$tmp_ref"
             done
         fi
-    
+
         # --- Merge ASV counts + reference matches into main summary ---
         awk -v FS="\t" -v OFS="\t" -v cnt="$tmp_counts" -v ref="$tmp_ref" '
             BEGIN {{
@@ -103,9 +102,8 @@ rule append_asv_counts:
             }}
             {{print}}
         ' "{input.summary}" > "{output.summary_with_asvs}"
-    
+
         rm "$tmp_counts" "$tmp_ref"
-    
+
         echo "✅ append_asv_counts completed successfully."
         """
-    

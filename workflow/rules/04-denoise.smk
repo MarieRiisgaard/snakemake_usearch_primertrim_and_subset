@@ -46,10 +46,10 @@ rule concat_subsample:
     conda:
         "../envs/snakemake_usearch.yml"
     resources:
-        mem_mb=64000,   # 64 GB; adjust as needed
+        mem_mb=32000,   # 32 GB; adjust as needed
         runtime=180,    # minutes
-        cpus_per_task=2
-    threads: 2
+        cpus_per_task=1
+    threads: 1
     shell:
         r"""
         exec &> "{log}"
@@ -157,43 +157,3 @@ rule unoise_subset:
         fi
         """
 
-
-
-############################################
-# 3️⃣ UNOISE denoise per subset
-############################################
-#rule unoise_subset:
-#    input:
-#        os.path.join(config["tmp_dir"], "04-denoise", "{subset}", "all_samples_trimmed_derep.fa")
-#    output:
-#        os.path.join(config["output_dir"], "04-denoise", "{subset}", "zOTUs.fa")
-#    log:
-#        os.path.join(config["log_dir"], "04-denoise", "{subset}_unoise.log")
-#    message:
-#        "Denoising subset {wildcards.subset} with UNOISE3"
-#    params:
-#        unoise_minsize=config["unoise_minsize"]
-#    container:
-#        "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
-#    conda:
-#        "../envs/snakemake_usearch.yml"
-#    threads: 1
-#    shell:
-#        r"""
-#        exec &> "{log}"
-#        set -euxo pipefail
-#
-#        mkdir -p $(dirname {output})
-#
-#        usearch -unoise3 \
-#          {input} \
-#          -zotus {output} \
-#          -sizeout \
-#          -minsize {params.unoise_minsize}
-#
-#        if [ ! -s "{output}" ]; then
-#            echo "output file {output} is empty, exiting!"
-#            exit 1
-#        fi
-#        """
-#
