@@ -40,9 +40,13 @@ include: "rules/06-append_asv_counts.smk"
 # Define subsets outside any rule
 subset_dirs = ["all_reads"] + [
     f"sample_size_{s}"
-    for s in config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000, 400000])
-]
+    for s in config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000])
+] + ["sample_size_all_reads"]
 
+
+###############################################################
+# Final output targets
+###############################################################
 
 rule all:
     input:
@@ -56,13 +60,17 @@ rule all:
             sample=sample_dirs
         ),
 
-        # --- Subsampling outputs ---
-        #expand(
-        #    os.path.join(config["output_dir"], "subsample", "sample_size_{size}", "{sample}_subsampled_{size}.fastq"),
-        #    sample=sample_dirs,
-        #    size=config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000, 400000])
-        #),
-        os.path.join(config["output_dir"], "subsample", "subsample_summary.tsv"),
+        # --- Subsampling outputs (merged all samples) ---
+        expand(
+            os.path.join(
+                config["output_dir"],
+                "03-subsample",
+                "sample_size_{size}",
+                "all_samples_subsampled_{size}.fastq"
+            ),
+            size=config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000])
+        ),
+        os.path.join(config["output_dir"], "03-subsample", "subsample_summary.tsv"),
 
         # --- Denoising outputs ---
         expand(
@@ -74,13 +82,52 @@ rule all:
         expand(
             os.path.join(config["output_dir"], "05-sintax", "{subset}", "zOTUs.sintax"),
             subset=subset_dirs
-        ), 
-        # --- Subsampling outputs ---
-        expand(
-            os.path.join(config["output_dir"], "subsample", "sample_size_{size}", "{sample}_subsampled_{size}.fastq"),
-            sample=sample_dirs,
-            size=config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000, 400000])
         ),
+
+        # --- Post-summary outputs ---
         os.path.join(config["output_dir"], "subsample_summary_with_ASVs.tsv"),
         os.path.join(config["output_dir"], "subsample_summary_ASV_matches.tsv"),
 
+
+
+#rule all:
+#    input:
+#        # --- Pre-subsampling statistics ---
+#        expand(
+#            os.path.join(config["tmp_dir"], "totalreads", "{sample}_totalreads.csv"),
+#            sample=sample_dirs
+#        ),
+#        expand(
+#            os.path.join(config["tmp_dir"], "totalreads_trimmed", "{sample}_totaltrimmedreads.csv"),
+#            sample=sample_dirs
+#        ),
+#
+#        # --- Subsampling outputs ---
+#        #expand(
+#        #    os.path.join(config["output_dir"], "subsample", "sample_size_{size}", "{sample}_subsampled_{size}.fastq"),
+#        #    sample=sample_dirs,
+#        #    size=config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000, 400000])
+#        #),
+#        os.path.join(config["output_dir"], "subsample", "subsample_summary.tsv"),
+#
+#        # --- Denoising outputs ---
+#        expand(
+#            os.path.join(config["output_dir"], "04-denoise", "{subset}", "zOTUs.fa"),
+#            subset=subset_dirs
+#        ),
+#
+#        # --- Taxonomy assignment ---
+#        expand(
+#            os.path.join(config["output_dir"], "05-sintax", "{subset}", "zOTUs.sintax"),
+#            subset=subset_dirs
+#        ), 
+#        # --- Subsampling outputs ---
+#        expand(
+#            os.path.join(config["output_dir"], "subsample", "sample_size_{size}", "{sample}_subsampled_{size}.fastq"),
+#            sample=sample_dirs,
+#            size=config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000, 400000])
+#        ),
+#        os.path.join(config["output_dir"], "subsample_summary_with_ASVs.tsv"),
+#        os.path.join(config["output_dir"], "subsample_summary_ASV_matches.tsv"),
+#
+#
