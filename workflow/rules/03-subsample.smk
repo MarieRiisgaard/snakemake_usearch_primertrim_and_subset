@@ -80,13 +80,11 @@ rule subsample_reads:
     input:
         os.path.join(config["tmp_dir"], "merged", "all_samples_trimmed.fastq")
     output:
-        temp(
-            os.path.join(
-                config["output_dir"],
-                "03-subsample",
-                "sample_size_{size}",
-                "all_samples_subsampled_{size}.fastq"
-            )
+        os.path.join(
+            config["output_dir"],
+            "03-subsample",
+            "sample_size_{size}",
+            "all_samples_subsampled_{size}.fastq"
         )
     log:
         os.path.join(config["log_dir"], "03-subsample", "{size}.log")
