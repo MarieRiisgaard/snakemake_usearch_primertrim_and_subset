@@ -156,19 +156,20 @@ rule merge_subsample_summaries:
 
         merged_sample="all_samples"
         replicate_list="{params.replicate_list}"
-        total_reads_file={config[tmp_dir]}/merged/all_samples_trimmed.fastq
+        total_reads_file={{config[tmp_dir]}}/merged/all_samples_trimmed.fastq
 
-        if [ -s "$total_reads_file" ]; then
-            total_reads=$(grep -c '^+$' "$total_reads_file" || echo 0)
+        if [ -s "${{total_reads_file}}" ]; then
+            total_reads=$(grep -c '^+$' "${{total_reads_file}}" || echo 0)
         else
+            echo "⚠️ Missing merged file: ${{total_reads_file}}"
             total_reads=0
         fi
 
-        reads_after_trim=$total_reads  # identical here since merging uses trimmed reads
+        reads_after_trim=${{total_reads}}  # identical here since merging uses trimmed reads
 
         echo -e "Merged_Sample\tReplicates\tTotal_Reads\tReads_After_Trim\tSubsample_Size\tReads_Subsampled" > {output}
 
-        for subsample_file in {input}; do
+        for subsample_file in {{input}}; do
             size=$(basename "$subsample_file" | sed 's/all_samples_subsampled_//' | sed 's/.fastq//')
             if [ -s "$subsample_file" ]; then
                 reads_subsampled=$(grep -c '^+$' "$subsample_file" || echo 0)
