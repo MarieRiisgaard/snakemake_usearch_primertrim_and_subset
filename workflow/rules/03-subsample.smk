@@ -103,6 +103,9 @@ rule subsample_reads:
     conda:
         "../envs/snakemake_usearch.yml"
     threads: 2
+    resources:
+        mem_mb=32000,     # 👈 give it 32 GB
+        runtime=120,      # minutes or use SLURM default if not handled
     message:
         "Subsampling merged reads to size {wildcards.size}"
     shell:
