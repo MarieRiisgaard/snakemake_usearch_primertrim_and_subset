@@ -59,6 +59,9 @@ rule concat_all_trimmed:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
     conda:
         "../envs/snakemake_usearch.yml"
+    resources:
+        mem_mb=32000,     # 👈 give it 32 GB
+        runtime=120,      # minutes or use SLURM default if not handled
     threads: 1
     shell:
         r"""
