@@ -104,7 +104,7 @@ rule subsample_reads:
         "../envs/snakemake_usearch.yml"
     threads: 2
     resources:
-        mem_mb=32000,     # 👈 give it 32 GB
+        mem_mb=64000,     # 👈 give it 64 GB
         runtime=120,      # minutes or use SLURM default if not handled
     message:
         "Subsampling merged reads to size {wildcards.size}"
