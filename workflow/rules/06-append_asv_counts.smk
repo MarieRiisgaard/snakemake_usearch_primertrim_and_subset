@@ -45,7 +45,7 @@ rule append_asv_counts:
         if [ -n "{params.reference_amplicons}" ] && [ -s "{params.reference_amplicons}" ]; then
             echo "Reference file found: {params.reference_amplicons}"
 
-            for zotus_file in {{input.zotus}}; do
+            for zotus_file in {input.zotus}; do
                 subset=$(basename "$(dirname "$zotus_file")")
 
                 # Skip placeholder files

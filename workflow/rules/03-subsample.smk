@@ -15,6 +15,11 @@ def get_dynamic_subsample_sizes(wildcards):
     """
     merged_fastq = os.path.join(config["tmp_dir"], "merged", "all_samples_trimmed.fastq")
 
+    # 👇 Key line: skip grep if file doesn’t exist yet
+    if not os.path.exists(merged_fastq):
+        print(f"[INFO] {merged_fastq} not found yet (DAG build). Returning default sizes.")
+        return config.get("subsample_sizes", [10000, 20000, 50000, 100000, 200000])
+
     try:
         nreads = int(subprocess.check_output(["grep", "-c", "^+$", merged_fastq]).strip())
     except Exception:
@@ -127,9 +132,6 @@ rule subsample_reads:
         """
 
 
-# -------------------------------------------------------------
-# 3️⃣ Summarize results across all subsampling levels
-# -------------------------------------------------------------
 rule merge_subsample_summaries:
     input:
         merged_fastq = os.path.join(config["tmp_dir"], "merged", "all_samples_trimmed.fastq"),
@@ -157,7 +159,7 @@ rule merge_subsample_summaries:
 
         merged_sample="all_samples"
         replicate_list="{params.replicate_list}"
-        total_reads_file="{input.merged_fastq}"
+        total_reads_file="$(realpath {input.merged_fastq})"
 
         if [ -s "$total_reads_file" ]; then
             total_reads=$(grep -c '^+$' "$total_reads_file" || echo 0)
