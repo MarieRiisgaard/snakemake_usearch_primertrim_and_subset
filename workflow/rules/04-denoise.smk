@@ -92,11 +92,11 @@ rule derep_subset:
 ###############################################################
 rule unoise_subset:
     input:
-        os.path.join(config["tmp_dir"], "04-denoise", "{subset}", "all_samples_trimmed_derep.fa")
+        os.path.join(config["tmp_dir"], "04-denoise", "sample_size_{subset}", "all_samples_trimmed_derep.fa")
     output:
-        os.path.join(config["output_dir"], "04-denoise", "{subset}", "zOTUs.fa")
+        os.path.join(config["output_dir"], "04-denoise", "sample_size_{subset}", "zOTUs.fa")
     log:
-        os.path.join(config["log_dir"], "04-denoise", "{subset}_unoise.log")
+        os.path.join(config["log_dir"], "04-denoise", "sample_size_{subset}_unoise.log")
     message:
         "Denoising subset {wildcards.subset} with UNOISE3"
     params:

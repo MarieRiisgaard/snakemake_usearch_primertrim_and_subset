@@ -4,15 +4,15 @@
 rule abund_table:
     input:
         zotus=lambda wc: os.path.join(
-            config["output_dir"], "04-denoise", wc.subset, "zOTUs.fa.filtered"
+            config["output_dir"], "04-denoise", f"sample_size_{wc.subset}", "zOTUs.fa.filtered"
         ),
         allreads_unfiltered=lambda wc: os.path.join(
             config["output_dir"], "03-subsample", f"sample_size_{wc.subset}", f"all_samples_subsampled_{wc.subset}.fastq"
         )
     output:
-        os.path.join(config["tmp_dir"], "05-abund_table", "abund_table_{subset}.tsv"),
+        os.path.join(config["tmp_dir"], "07-abund_table", "abund_table_{subset}.tsv"),
     log:
-        os.path.join(config["log_dir"], "05-abund_table", "abund_table_{subset}.log"),
+        os.path.join(config["log_dir"], "07-abund_table", "abund_table_{subset}.log"),
     message:
         "{wildcards.subset}: Estimating abundances of zOTUs/ASVs"
     threads: lambda wc, input: min(config.get("max_threads", 8), 16)
@@ -48,9 +48,9 @@ rule merge_abund_tables:
             subset=get_dynamic_subsample_sizes(wc)
         )
     output:
-        os.path.join(config["output_dir"], "05-abund_table", "abund_table_merged.tsv")
+        os.path.join(config["output_dir"], "07-abund_table", "abund_table_merged.tsv")
     log:
-        os.path.join(config["log_dir"], "05-abund_table", "merge_abund_tables.log")
+        os.path.join(config["log_dir"], "07-abund_table", "merge_abund_tables.log")
     message:
         "Merging abundance tables across all subsets"
     threads: 1
@@ -62,9 +62,9 @@ rule merge_abund_tables:
         r"""
         exec &> "{log}"
         set -euxo pipefail
-    
+
         mkdir -p "$(dirname {output})"
-    
+
         nfiles=$(echo {input} | wc -w)
         if [ "$nfiles" -eq 1 ]; then
             echo "⚠️ Only one abundance table found — copying instead of merging"
