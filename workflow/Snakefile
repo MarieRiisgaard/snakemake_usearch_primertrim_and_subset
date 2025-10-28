@@ -75,13 +75,13 @@ rule all:
 
         # --- Denoising outputs ---
         expand(
-            os.path.join(config["output_dir"], "04-denoise", "{subset}", "zOTUs.fa"),
+            os.path.join(config["output_dir"], "04-denoise", "sample_size_{subset}", "zOTUs.fa"),
             subset=subset_dirs
         ),
 
         # --- Taxonomy assignment ---
         expand(
-            os.path.join(config["output_dir"], "05-sintax", "{subset}", "zOTUs.sintax"),
+            os.path.join(config["output_dir"], "05-sintax", "sample_size_{subset}", "zOTUs.sintax"),
             subset=subset_dirs
         ),
 
