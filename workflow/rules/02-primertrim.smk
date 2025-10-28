@@ -13,7 +13,7 @@ rule trim_primers:
     output:
         fastq_trimmed=os.path.join(
             config["tmp_dir"],
-            "02-denoise",
+            "02-trim_primers",
             "{sample}",
             "{sample}_trimmed.fastq",
         ),
@@ -23,7 +23,7 @@ rule trim_primers:
             "{sample}_totaltrimmedreads.csv",
         ),
     log:
-        os.path.join(config["log_dir"], "02-denoise", "trim_primers_{sample}.log"),
+        os.path.join(config["log_dir"], "02-trim_primers", "trim_primers_{sample}.log"),
     params:
         primers=config["primers"],
     message:

@@ -5,7 +5,7 @@ rule append_asv_counts:
     input:
         summary=os.path.join(config["output_dir"], "03-subsample", "subsample_summary.tsv"),
         zotus=expand(
-            os.path.join(config["output_dir"], "04-denoise", "sample_size_{subset}", "zOTUs.fa.filtered"),
+            os.path.join(config["output_dir"], "04-denoise", "{subset}", "zOTUs.fa.filtered"),
             subset=subset_dirs
         )
     output:

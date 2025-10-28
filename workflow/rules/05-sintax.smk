@@ -3,12 +3,12 @@
 ############################################
 rule sintax_subset:
     input:
-        os.path.join(config["output_dir"], "04-denoise", "sample_size_{subset}", "zOTUs.fa")
+        os.path.join(config["output_dir"], "04-denoise", "{subset}", "zOTUs.fa")
     output:
-        filtered=os.path.join(config["output_dir"], "04-denoise", "sample_size_{subset}", "zOTUs.fa.filtered"),
-        sintax=os.path.join(config["output_dir"], "05-sintax", "sample_size_{subset}", "zOTUs.sintax")
+        filtered=os.path.join(config["output_dir"], "04-denoise", "{subset}", "zOTUs.fa.filtered"),
+        sintax=os.path.join(config["output_dir"], "05-sintax", "{subset}", "zOTUs.sintax")
     log:
-        os.path.join(config["log_dir"], "05-sintax", "sample_size_{subset}_sintax.log")
+        os.path.join(config["log_dir"], "05-sintax", "{subset}_sintax.log")
     message:
         "Predicting taxonomy of zOTUs for subset {wildcards.subset} using SINTAX"
     resources:
