@@ -89,7 +89,7 @@ rule all:
         os.path.join(config["output_dir"], "subsample_summary_with_ASVs.tsv"),
         os.path.join(config["output_dir"], "subsample_summary_ASV_matches.tsv"),
         # --- Abundance table ---
-        os.path.join(config["output_dir"], "05-abund_table", "abund_table_merged.tsv")
+        os.path.join(config["output_dir"], "07-abund_table", "abund_table_merged.tsv")
 
 
 
