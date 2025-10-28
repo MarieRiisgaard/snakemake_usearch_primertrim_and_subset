@@ -44,7 +44,7 @@ rule abund_table:
 rule merge_abund_tables:
     input:
         lambda wc: expand(
-            os.path.join(config["tmp_dir"], "05-abund_table", "abund_table_{subset}.tsv"),
+            os.path.join(config["tmp_dir"], "07-abund_table", "abund_table_{subset}.tsv"),
             subset=get_dynamic_subsample_sizes(wc)
         )
     output:
