@@ -132,7 +132,8 @@ rule subsample_reads:
 # -------------------------------------------------------------
 rule merge_subsample_summaries:
     input:
-        lambda wildcards: expand(
+        merged_fastq = os.path.join(config["tmp_dir"], "merged", "all_samples_trimmed.fastq"),
+        subsamples = lambda wildcards: expand(
             os.path.join(
                 config["output_dir"],
                 "03-subsample",
@@ -156,7 +157,7 @@ rule merge_subsample_summaries:
 
         merged_sample="all_samples"
         replicate_list="{params.replicate_list}"
-        total_reads_file="{config[tmp_dir]}/merged/all_samples_trimmed.fastq"
+        total_reads_file="{input.merged_fastq}"
 
         if [ -s "$total_reads_file" ]; then
             total_reads=$(grep -c '^+$' "$total_reads_file" || echo 0)
@@ -169,7 +170,7 @@ rule merge_subsample_summaries:
 
         echo -e "Merged_Sample\tReplicates\tTotal_Reads\tReads_After_Trim\tSubsample_Size\tReads_Subsampled" > {output}
 
-        for subsample_file in {input}; do
+        for subsample_file in {input.subsamples}; do
             size=$(basename "$subsample_file" | sed 's/all_samples_subsampled_//' | sed 's/.fastq//')
             if [ -s "$subsample_file" ]; then
                 reads_subsampled=$(grep -c '^+$' "$subsample_file" || echo 0)
@@ -181,7 +182,6 @@ rule merge_subsample_summaries:
 
         echo "✅ Summary written to {output}"
         """
-
 
 
 
