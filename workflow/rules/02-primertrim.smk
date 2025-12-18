@@ -58,17 +58,33 @@ rule trim_primers:
         rm {output.fastq_trimmed}.tmp
 
         # --- Check output file not empty ---
+        #if [ ! -s "{output.fastq_trimmed}" ]; then
+        #    echo "Output file {output.fastq_trimmed} is empty after filtering! Exiting."
+        #    exit 1
+        #fi
+
+        # --- Check output file not empty ---
         if [ ! -s "{output.fastq_trimmed}" ]; then
-            echo "Output file {output.fastq_trimmed} is empty after filtering! Exiting."
-            exit 1
+            echo "No reads passed filtering. Creating empty FASTQ."
+            : > "{output.fastq_trimmed}"
+            num_reads=0
+        else
+            # Count reads after trimming & filtering
+            num_reads=$(grep -c '^+$' "{output.fastq_trimmed}")
         fi
 
-        # --- Count reads after trimming & filtering ---
-        num_reads=$(grep -c '^+$' {output.fastq_trimmed})
         echo "{wildcards.sample},$num_reads" > "{output.reads_trimmed}"
 
         echo "*** Primer trimming and cleanup completed for {wildcards.sample}"
-        """
+
+
+
+        # --- Count reads after trimming & filtering ---
+        #num_reads=$(grep -c '^+$' {output.fastq_trimmed})
+        #echo "{wildcards.sample},$num_reads" > "{output.reads_trimmed}"
+
+        #echo "*** Primer trimming and cleanup completed for {wildcards.sample}"
+        #"""
 
 ###############################################
 # End of file

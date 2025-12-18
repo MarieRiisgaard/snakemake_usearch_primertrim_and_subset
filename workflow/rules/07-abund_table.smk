@@ -18,6 +18,8 @@ rule abund_table:
     threads: lambda wc, input: min(config.get("max_threads", 8), 16)
     container:
         "docker://ghcr.io/kasperskytte/snakemake_usearch:main"
+    resources:
+        runtime="7200"     # Walltime (12h) - due to time out issues
     conda:
         "../envs/snakemake_usearch.yml"
     params:
