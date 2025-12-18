@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/MarieRiisgaard/snakemake_usearch_primertrim_and_subset/compare/v1.2.0...v1.2.1) (2025-12-18)
+
+
+### Bug Fixes
+
+* corrected read summary parsing (NR==1), increased memory for concat_subsample, and improved workflow stability ([6ac388c](https://github.com/MarieRiisgaard/snakemake_usearch_primertrim_and_subset/commit/6ac388ca4e4581342c4bada6077969be2d5ca366))
+* remove zero-length reads after primer trimming ([ddb4bd9](https://github.com/MarieRiisgaard/snakemake_usearch_primertrim_and_subset/commit/ddb4bd97f025380338bd4f73059df7e682f624fe))
+
 ## [1.1.1](https://github.com/KasperSkytte/snakemake_usearch/compare/v1.1.0...v1.1.1) (2025-09-03)
 
 
