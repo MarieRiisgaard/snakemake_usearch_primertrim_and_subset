@@ -68,3 +68,4 @@ rule abund_table:
 #
 #        usearch -otutab_rare "{input}" -sample_size {params.rarefy_sample_size} -output "{output}"
 #        """
+#
